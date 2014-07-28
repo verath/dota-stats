@@ -1,4 +1,5 @@
-var util = require('util')
+var util = require('util');
+var http = require('http');
 var querystring = require('querystring');
 var Q = require('q');
 var q_http = require("q-io/http");
@@ -44,9 +45,11 @@ function SteamApi() {
                     apiKey = key;
                     return Q.resolve();
                 } else if (response.status === 401) {
-                    return Q.reject(new Error('Invalid API Key'));
+                    return Q.reject(new Error('Invalid API Key.'));
                 } else {
-                    return Q.reject(new Error('Unexpected HTTP response code "' + response.status + '"'));
+                    return Q.reject(new Error(
+                            'Unexpected HTTP response code "' + response.status +
+                            '" (' + http.STATUS_CODES[response.status] + ').'));
                 }
             });
     };
@@ -126,34 +129,37 @@ function SteamApi() {
         if (apiMethodExists(interfaceName, methodName, versionNumber)) {
             var methodParams = apiInterfaces[interfaceName][methodName][versionNumber];
 
-            if('key' in methodParams) {
-                // Add the api key if it is required
-                queryParams['key'] = apiKey;
-            }
+            // Add the api key
+            queryParams['key'] = apiKey;
 
             // Make sure we have all required params before making the request
             for (var paramName in methodParams) {
                 if (!methodParams.hasOwnProperty(paramName)) continue;
                 if (!methodParams[paramName].optional && !(paramName in queryParams)) {
-                    return Q.reject(new Error('Missing required parameter: "' + paramName + '"'));
+                    var err = new Error('Missing required parameter: "' + paramName + '"');
+                    err.status = 400;
+                    return Q.reject(err);
                 }
             }
 
             var methodUrl = [STEAM_API_BASE_URL, interfaceName, methodName, 'v' + versionNumber].join('/');
             var queryString = querystring.stringify(queryParams);
 
+            console.log(methodUrl + '?' + queryString);
             // Make the request
             return q_http.request(methodUrl + '?' + queryString)
                 .then(function (response) {
                     if (response.status === 200) {
                         return response.body.read();
                     } else if (response.status === 401) {
-                        return Q.reject(new Error('Invalid API Key'));
+                        var err = new Error('Invalid API Key.');
+                        err.code = 401;
+                        return Q.reject(err);
                     } else {
-                        return Q.reject(new Error('Unexpected HTTP response code "' + response.status + '"'));
+                        return Q.reject(new Error('Unexpected HTTP response code "' + response.status + '".'));
                     }
                 })
-                .then(function(body){
+                .then(function (body) {
                     try {
                         return Q.resolve(JSON.parse(body.toString()));
                     } catch (err) {
@@ -163,7 +169,9 @@ function SteamApi() {
 
             return Q.resolve();
         } else {
-            return Q.reject("The Steam API method specified does not exist!");
+            var err = new Error("The API method specified does not exist.");
+            err.status = 404;
+            return Q.reject(err);
         }
     }
 }
