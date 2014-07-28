@@ -1,0 +1,16 @@
+{
+  "name": "Dota2_Stats",
+  "description": "Personal Dota 2 stats",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "postinstall": "bower install",
+    "start": "node ./app/app.js"
+  },
+  "dependencies": {
+    "express": "~4.2.0",
+    "q": "^1.0.1",
+    "q-io": "^1.11.3"
+  }
+}

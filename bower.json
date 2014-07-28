@@ -1,0 +1,14 @@
+{
+  "name": "Dota2_Stats",
+  "description": "Personal Dota 2 stats",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "1.3.x",
+    "angular-route": "1.3.x",
+    "angular-loader": "1.3.x",
+    "angular-local-storage": "~0.0.5",
+    "bootstrap": "~3.2.0"
+  }
+}
