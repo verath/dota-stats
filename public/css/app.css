@@ -1,3 +1,28 @@
 body {
     padding-top: 50px;
 }
+
+.form-player-id {
+    max-width: 330px;
+    padding: 15px;
+    margin: 0 auto;
+}
+
+.form-player-id .form-player-id-heading {
+     margin-bottom: 10px;
+ }
+
+.form-player-id .form-control {
+    position: relative;
+    height: auto;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+}
+
+
+.form-player-id input[type="text"] {
+    margin-bottom: 10px;
+}

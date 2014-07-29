@@ -12,21 +12,29 @@ ctrls.controller("AppCtrl", function ($rootScope) {
 });
 
 
-ctrls.controller("ViewHomeCtrl", function($scope, $location, steamApi) {
-    if(!steamApi.getApiKey()) {
-        $location.path('/setup');
-    }
-    $scope.message = "Hello World!";
+ctrls.controller("ViewHomeCtrl", function ($location, $timeout, focus, steamApi) {
+    this.isSearching = false;
+
+    this.searchSteamId = function (id) {
+        this.isSearching = true;
+        steamApi.validateUserId(id)
+            .then(function (profileData) {
+                console.log(profileData);
+            }, function () {
+                focus("user-id-input")
+                this.isSearching = false;
+            }.bind(this))
+    };
 });
 
-ctrls.controller("ViewSetupCtrl", function($location, steamApi) {
+ctrls.controller("ViewSetupCtrl", function ($location, steamApi) {
     this.apiKey = steamApi.getApiKey();
 
     this.saveKey = function saveKey() {
         steamApi.setApiKey(this.apiKey)
-            .then(function() {
+            .then(function () {
                 $location.path('/');
-            }, function(){
+            }, function () {
                 console.log("ERRORS!");
             });
     }

@@ -5,31 +5,27 @@ var services = angular.module('myApp.services', ['LocalStorageModule']);
 
 services.factory('steamApi', function ($q, $http, localStorageService) {
     var LS_PREFIX = 'steamApi.';
-    var LS_KEY_API_KEY = LS_PREFIX + 'api_key';
 
-    var VALIDATE_KEY_URL_PATTERN = 'http://127.0.0.1:3000/api/IDOTA2Match_570/GetMatchDetails/v1?match_id=-1&key=_KEY_';
+    var API_HOST = 'http://127.0.0.1:3000/api';
+    var VALIDATE_USER_METHOD = API_HOST + '/ISteamUser/GetPlayerSummaries/v0002/';
 
-    // Cache of keys that have been validated against the steam API
-    var validKeys = [];
 
-    // Get stored key
-    var api_key = localStorageService.get(LS_KEY_API_KEY);
-
-    var validateApiKey = function (key) {
+    var validateUserId = function (userId) {
         var validateDefer = $q.defer();
-        if (!angular.isString(key)) {
-            validateDefer.reject("Not a string.");
-        } else if (validKeys.indexOf(key) !== -1) {
-            validateDefer.resolve(key);
+
+        if (!angular.isString(userId)) {
+            validateDefer.reject("userId should be a string");
         } else {
-            $http
-                .get(VALIDATE_KEY_URL_PATTERN.replace('_KEY_', key))
-                .success(function (response) {
-                    if (response.status !== 401) {
-                        validKeys.push(key);
-                        validateDefer.resolve(key);
+            $http.get(VALIDATE_USER_METHOD + "?steamids=" + userId)
+                .success(function (data, status) {
+                    if (status !== 200) {
+                        validateDefer.reject("Got an unexpected HTTP status code: " + status);
+                    } else if (!data || !data['response'] || !data['response']['players']) {
+                        validateDefer.reject('Missing required data from the response');
+                    } else if (data['response']['players'].length === 0) {
+                        validateDefer.reject('No player matched that id');
                     } else {
-                        validateDefer.reject("Invalid Key.");
+                        validateDefer.resolve(data['response']['players'][0]);
                     }
                 }).error(function (err) {
                     validateDefer.reject("HTTP Error.")
@@ -38,19 +34,7 @@ services.factory('steamApi', function ($q, $http, localStorageService) {
         return validateDefer.promise;
     };
 
-    var setApiKey = function (key) {
-        return validateApiKey(key).then(function () {
-            localStorageService.set(LS_KEY_API_KEY, key);
-            api_key = key;
-        });
-    };
-
-    var getApiKey = function () {
-        return api_key;
-    };
-
     return {
-        setApiKey: setApiKey,
-        getApiKey: getApiKey
+        validateUserId: validateUserId,
     };
 });

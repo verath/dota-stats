@@ -3,6 +3,7 @@ var path = require('path');
 
 var express = require('express');
 var Q = require('q');
+
 var config = require('./config/config');
 var steamApi = require('./steam_api');
 

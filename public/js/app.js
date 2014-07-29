@@ -5,11 +5,13 @@ angular.module('myApp', [
     'myApp.filters',
     'myApp.services',
     'myApp.directives',
-    'myApp.controllers'
+    'myApp.controllers',
+    'ui.ladda',
+    'focusOn'
 ]).config(['$routeProvider', function ($routeProvider) {
     $routeProvider
         .when('/', {
-            controller: 'ViewHomeCtrl',
+            controller: 'ViewHomeCtrl as homeCtrl',
             templateUrl: 'partials/home.html'
         })
         .when('/setup', {
