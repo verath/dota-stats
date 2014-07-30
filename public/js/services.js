@@ -7,34 +7,35 @@ services.factory('steamApi', function ($q, $http, localStorageService) {
     var LS_PREFIX = 'steamApi.';
 
     var API_HOST = 'http://127.0.0.1:3000/api';
-    var VALIDATE_USER_METHOD = API_HOST + '/ISteamUser/GetPlayerSummaries/v0002/';
+    var PLAYER_SUMMARY_METHOD = API_HOST + '/ISteamUser/GetPlayerSummaries/v0002/';
 
+    // Tests a string to see if it looks like a valid 64 bit steam id
+    var isValidSteamId64 = function (steamId) {
+        // A steam 64 bit id is 17 digits starting with
+        // 7656119 followed by 10 chars.
+        return (/^7656119\d{10}$/.test(steamId));
+    };
 
-    var validateUserId = function (userId) {
-        var validateDefer = $q.defer();
-
-        if (!angular.isString(userId)) {
-            validateDefer.reject("userId should be a string");
-        } else {
-            $http.get(VALIDATE_USER_METHOD + "?steamids=" + userId)
-                .success(function (data, status) {
-                    if (status !== 200) {
-                        validateDefer.reject("Got an unexpected HTTP status code: " + status);
-                    } else if (!data || !data['response'] || !data['response']['players']) {
-                        validateDefer.reject('Missing required data from the response');
-                    } else if (data['response']['players'].length === 0) {
-                        validateDefer.reject('No player matched that id');
+    var getPlayerSummary = function (steamId) {
+        if (isValidSteamId64(steamId)) {
+            var getUserDefer = $q.defer();
+            $http.get(PLAYER_SUMMARY_METHOD + "?steamids=" + steamId)
+                .success(function (data) {
+                    if (data['response']['players'].length === 1) {
+                        getUserDefer.resolve(data['response']['players'][0]);
                     } else {
-                        validateDefer.resolve(data['response']['players'][0]);
+                        getUserDefer.reject(new Error('No user with that Steam ID'));
                     }
                 }).error(function (err) {
-                    validateDefer.reject("HTTP Error.")
+                    getUserDefer.reject(err);
                 });
+            return getUserDefer.promise;
+        } else {
+            return $q.reject(new Error('Invalid steam id'));
         }
-        return validateDefer.promise;
     };
 
     return {
-        validateUserId: validateUserId,
+        getPlayerSummary: getPlayerSummary
     };
 });

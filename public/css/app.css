@@ -1,5 +1,5 @@
 body {
-    padding-top: 50px;
+    padding-top: 60px;
 }
 
 .form-player-id {
@@ -25,4 +25,16 @@ body {
 
 .form-player-id input[type="text"] {
     margin-bottom: 10px;
+}
+
+.fade-in, .fade-out {
+    opacity: 1;
+}
+.fade-in.ng-hide, .fade-out.ng-hide {
+    opacity:0!important;
+}
+
+.fade-out.ng-hide-add.ng-hide-add-active,
+.fade-in.ng-hide-remove.ng-hide-remove-active {
+    transition: opacity 0.2 ease-in-out;
 }

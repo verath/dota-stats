@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp">
+<html lang="en" ng-app="myApp" ng-controller="AppCtrl as appCtrl">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,7 +14,11 @@
 
     <title>Dota 2 Stats</title>
 
+    <!-- App styles -->
     <link rel="stylesheet" href="css/app.css"/>
+
+    <!-- Loading spinner style from http://tobiasahlin.com/spinkit/ -->
+    <link rel="stylesheet" href="css/loading.css"/>
 </head>
 <body>
 
@@ -27,9 +31,28 @@
 </div>
 
 
-<div class="container" ng-view>
+<div class="container" ng-view ng-hide="appCtrl.loading.isLoading || appCtrl.error.isError">
 </div>
 
+<div class="container fade-in" ng-show="appCtrl.error.isError" >
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <error error-text="{{appCtrl.error.errorMessage}}"></error>
+        </div>
+    </div>
+</div>
+
+<div id="loadingOverlay" class="fade-out ng-cloak" ng-show="appCtrl.loading.isLoading">
+    <h1>Loading...</h1>
+
+    <div class="spinner">
+        <div class="rect1"></div>
+        <div class="rect2"></div>
+        <div class="rect3"></div>
+        <div class="rect4"></div>
+        <div class="rect5"></div>
+    </div>
+</div>
 
 <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
@@ -45,6 +68,7 @@
 <script src="bower_components/jquery/dist/jquery.min.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-route/angular-route.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
 
 <!-- angular-local-storage -->
 <script src="bower_components/angular-local-storage/angular-local-storage.js"></script>

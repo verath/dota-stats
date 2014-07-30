@@ -1,14 +1,23 @@
 <form role="form" class="form-player-id">
-    <h2 class="form-player-id-heading">Find Steam user ID</h2>
-    <input type="text"
-           class="form-control"
-           placeholder="Steam user ID"
-           focus-on="user-id-input"
-           required
-           autofocus
-           ng-disabled="homeCtrl.isSearching"
-           ng-required
-           ng-model="model.steamId">
+    <h2 class="form-player-id-heading">Find Steam Player</h2>
+
+
+    <div class="form-group" ng-class="{'has-error': homeCtrl.searchError}">
+
+
+        <input type="text"
+               class="form-control"
+               placeholder="Steam ID"
+               focus-on="player-id-input"
+               required
+               autofocus
+               ng-disabled="homeCtrl.isSearching"
+               ng-required
+               ng-model="model.steamId">
+
+        <span class="help-block" ng-show="homeCtrl.searchError"><small>Error: {{homeCtrl.searchError}}</small></span>
+
+    </div>
 
     <button type="submit"
             class="btn btn-lg btn-primary ladda-button pull-right"

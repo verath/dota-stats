@@ -1,0 +1,23 @@
+<div class="alert alert-danger" role="alert">
+    <h1>Ohh no, an error occurred!</h1>
+
+    <p><strong>Error:</strong> {{errorText}}</p>
+
+    <p>
+        <button type="button" class="btn btn-link" ng-click="goBack()">
+            Go Back
+        </button>
+
+        <button type="button"
+           class="btn btn-primary ladda-button"
+           data-style="expand-right"
+           ui-ladda="isRetrying"
+           ng-click="retry()">
+                    <span class="ladda-label">
+                        Retry
+                    </span>
+        </button>
+    </p>
+</div>
+
+

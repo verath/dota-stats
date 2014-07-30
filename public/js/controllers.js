@@ -4,38 +4,63 @@
 
 var ctrls = angular.module('myApp.controllers', []);
 
+ctrls.controller("AppCtrl", function ($rootScope, $location, $scope, $timeout) {
+    this.loading = {
+        isLoading: true
+    };
 
-ctrls.controller("AppCtrl", function ($rootScope) {
-    $rootScope.$on("$routeChangeError", function () {
-        console.log("failed to change routes");
-    });
+    this.error = {
+        isError: false,
+        errorMessage: ''
+    };
+
+    var showLoadingTimeout;
+
+    $rootScope.$on("$routeChangeStart", function (event, next, current) {
+        // Delay showing of loading screen, if the page loads faster than 300ms
+        showLoadingTimeout = $timeout(function () {
+            this.loading.isLoading = true;
+        }.bind(this), 300);
+        this.error.isError = false;
+    }.bind(this));
+
+    $rootScope.$on("$routeChangeSuccess", function (event, current, previous) {
+        $timeout.cancel(showLoadingTimeout);
+        this.loading.isLoading = false;
+    }.bind(this));
+
+    $rootScope.$on("$routeChangeError", function (event, current, previous, rejection) {
+        $timeout.cancel(showLoadingTimeout);
+        console.log("ROUTE CHANGE ERROR: ", rejection);
+        this.loading.isLoading = false;
+        this.error.isError = true;
+
+        if(rejection instanceof Error) {
+            this.error.errorMessage = rejection.message;
+        } else if(angular.isString(rejection)) {
+            this.error.errorMessage = rejection;
+        } else {
+            this.error.errorMessage = "An unexpected error occurred while loading the page."
+        }
+
+    }.bind(this));
 });
 
 
 ctrls.controller("ViewHomeCtrl", function ($location, $timeout, focus, steamApi) {
     this.isSearching = false;
 
-    this.searchSteamId = function (id) {
-        this.isSearching = true;
-        steamApi.validateUserId(id)
-            .then(function (profileData) {
-                console.log(profileData);
-            }, function () {
-                focus("user-id-input")
-                this.isSearching = false;
-            }.bind(this))
+    this.searchSteamId = function (searchStr) {
+        $location.path('/player/' + searchStr)
     };
 });
 
-ctrls.controller("ViewSetupCtrl", function ($location, steamApi) {
-    this.apiKey = steamApi.getApiKey();
-
-    this.saveKey = function saveKey() {
-        steamApi.setApiKey(this.apiKey)
-            .then(function () {
-                $location.path('/');
-            }, function () {
-                console.log("ERRORS!");
-            });
-    }
+var ViewPlayerCtrl = ctrls.controller("ViewPlayerCtrl", function ($scope, playerSummary) {
+    this.player = playerSummary;
 });
+
+ViewPlayerCtrl.resolve = {
+    playerSummary: function ($route, steamApi) {
+        return steamApi.getPlayerSummary($route.current.params.steamId);
+    }
+};
