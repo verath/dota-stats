@@ -10,7 +10,7 @@ directives.directive('error', function ($route, $rootScope, $location) {
         },
         restrict: 'E',
         templateUrl: '/partials/directives/error.html',
-        link: function (scope, element, attrs) {
+        link: function (scope) {
             scope.retry = function () {
                 $route.reload();
             };
