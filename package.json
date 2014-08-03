@@ -6,11 +6,14 @@
   "private": true,
   "scripts": {
     "postinstall": "bower install",
+    "prestart": "node ./node_modules/coffee-script/bin/coffee -c -m .",
     "start": "node ./app/app.js"
   },
   "dependencies": {
+    "coffee-script": "^1.7.1",
     "express": "~4.2.0",
     "q": "^1.0.1",
-    "q-io": "^1.11.3"
+    "q-io": "^1.11.3",
+    "redis": "^0.11.0"
   }
 }
