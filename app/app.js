@@ -2,15 +2,20 @@ var http = require('http');
 var path = require('path');
 
 var express = require('express');
+var redis = require('redis');
 var Q = require('q');
 
 var config = require('./config/config');
-var steamApi = require('./steam_api');
+var SteamApi = require('./steam_api');
+var redisClient = redis.createClient(config.REDIS.PORT, config.REDIS.HOST, config.REDIS.OPTIONS);
 
+var steamApi = new SteamApi(redisClient);
 var app = module.exports = express();
 
-app.use(express.static(path.join(__dirname, '../public')));
+// Serve public site as static files
+app.use('/', express.static(path.join(__dirname, '../public')));
 
+// Api methods
 app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, next) {
     var interfaceName = req.params['interfaceName'];
     var methodName = req.params['methodName'];
@@ -27,6 +32,11 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
                 next(new Error(err));
             }
         });
+});
+
+// This route deals enables HTML5Mode by forwarding missing files to the index.html
+app.all('/*', function(req, res) {
+    res.sendfile(path.join(__dirname, '../public/index.html'));
 });
 
 
@@ -54,7 +64,6 @@ app.set('port', process.env.PORT || 3000);
 
 // Validate steam key and fetch the api methods
 (function () {
-
     steamApi.setApiKey(config.STEAM_API_KEY)
         .then(steamApi.loadApiMethods)
         .then(function () {
