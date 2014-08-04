@@ -12,7 +12,10 @@ try {
 } catch (e) {
 }
 var SteamApi = require('./steam_api');
-var redisClient = redis.createClient(config.REDIS.PORT, config.REDIS.HOST, config.REDIS.OPTIONS);
+var redisClient = redis.createClient(
+    config.REDIS_PORT || process.env.REDIS_PORT,
+    config.REDIS_HOST || process.env.REDIS_HOST,
+    config.REDIS_OPTIONS || process.env.REDIS_OPTIONS );
 
 redisClient.on("error", function (err) {
     console.log("Redis Error: " + err);
@@ -79,7 +82,7 @@ app.set('port', process.env.PORT || 3000);
 
 // Validate steam key and fetch the api methods
 (function () {
-    steamApi.setApiKey(config.STEAM_API_KEY)
+    steamApi.setApiKey(config.STEAM_API_KEY || process.env.STEAM_API_KEY)
         .then(steamApi.loadApiMethods)
         .then(function () {
             var runningDefer = Q.defer();

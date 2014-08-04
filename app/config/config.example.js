@@ -1,9 +1,7 @@
 module.exports = {
     'STEAM_API_KEY': '', // http://steamcommunity.com/dev/apikey
 
-    'REDIS': {
-        'PORT': null,
-        'HOST': null,
-        'OPTIONS': null
-    }
+    'REDIS_PORT': null,
+    'REDIS_HOST': null,
+    'REDIS_OPTIONS': null
 };
