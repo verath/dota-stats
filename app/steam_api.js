@@ -15,6 +15,21 @@ var VALIDATE_KEY_METHOD = '/IDOTA2Match_570/GetMatchDetails/v1/';
 var SUPPORTED_API_LIST_METHOD = '/ISteamWebAPIUtil/GetSupportedAPIList/v0001/';
 
 function SteamApi(redisClient) {
+    var SECONDS_MINUTE = 60;
+    var SECONDS_HOUR = 60 * SECONDS_MINUTE;
+    var SECONDS_DAY = 24 * SECONDS_HOUR;
+    var SECONDS_WEEK = 7 * SECONDS_DAY;
+    var SECONDS_MONTH = 30 * SECONDS_DAY;
+
+    var METHOD_CACHE_EXPIRE_TIME = {
+        '/IEconDOTA2_570/GetHeroes/v1': SECONDS_DAY,
+        '/IDOTA2Match_570/GetMatchDetails/v1': SECONDS_MONTH,
+        '/ISteamUser/GetPlayerSummaries/v2': SECONDS_DAY,
+        '/IDOTA2Match_570/GetMatchHistory/v1': 5 * SECONDS_MINUTE
+    };
+
+    // Delay in milliseconds that must pass between each call to the api.
+    var STEAM_API_REQUEST_DELAY = 1000;
 
     // The Steam API key used for requests.
     var apiKey = '';
@@ -32,6 +47,8 @@ function SteamApi(redisClient) {
 //        }
     };
 
+
+
     // Tests if interfaceName, methodName, versionNumber entry exist in the
     // map of Steam API methods.
     var apiMethodExists = function (interfaceName, methodName, versionNumber) {
@@ -40,6 +57,17 @@ function SteamApi(redisClient) {
             apiInterfaces[interfaceName].hasOwnProperty(methodName) &&
             apiInterfaces[interfaceName][methodName].hasOwnProperty(versionNumber)
             );
+    };
+
+
+    var awaitDefer = Q.resolve();
+    var queueApiRequest = function (url) {
+        var requestDefer = Q.defer();
+        awaitDefer = awaitDefer.then(function() {
+            requestDefer.resolve(q_http.request(url));
+            return Q.delay(STEAM_API_REQUEST_DELAY)
+        });
+        return requestDefer.promise;
     };
 
     // Wrapper around q_http.request for storing/querying redis for a cached response
@@ -62,7 +90,7 @@ function SteamApi(redisClient) {
         }).catch(function () {
             var status;
             // No stored data in redis cache, do new request
-            return q_http.request(url).then(function (response) {
+            return queueApiRequest(url).then(function (response) {
                 status = response.status;
                 return response.body.read();
             }).then(function (bodyBuffer) {
@@ -178,9 +206,10 @@ function SteamApi(redisClient) {
             }
 
             var methodPath = '/' + interfaceName + '/' + methodName + '/v' + versionNumber;
+            var cacheExpire = METHOD_CACHE_EXPIRE_TIME[methodPath] || 60 * 60;
 
             // Make the request
-            return cachedHttpGet(methodPath, queryParams, 60*60)
+            return cachedHttpGet(methodPath, queryParams, cacheExpire)
                 .then(function (response) {
                     if (response.status === 200) {
                         try {
