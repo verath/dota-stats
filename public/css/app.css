@@ -96,6 +96,10 @@ body.no-js .hide-no-js, body.js .hide-js {
     margin-right: 2px;
 }
 
+.matchSummary .d2mh.hero-0 {
+    background: none;
+}
+
 .matchSummary.ng-enter {
     transition: opacity 0.5s ease-in-out;
 }
