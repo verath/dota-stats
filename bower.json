@@ -12,6 +12,7 @@
     "bootstrap": "~3.2.0",
     "ladda-bootstrap": "https://github.com/msurguy/ladda-bootstrap.git#2610e352a2b3f7e17bcb027aac7111c61ea37857",
     "ng-focus-on": "~0.2.2",
-    "lodash": "~2.4.1"
+    "lodash": "~2.4.1",
+    "angular-moment": "~0.8.0"
   }
 }
