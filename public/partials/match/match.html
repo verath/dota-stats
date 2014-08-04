@@ -1,0 +1,38 @@
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>
+                    Match {{matchCtrl.match.match_id}}
+                    ({{matchCtrl.match.start_time | date:'yyyy-MM-dd HH:mm:ss'}}
+                    -
+                    {{matchCtrl.match.start_time+matchCtrl.match.duration*1000 | date:'HH:mm:ss'}})
+                </h2>
+            </div>
+            <div class="col-md-6">
+                <h3>Radiant <span>({{matchCtrl.match.radiant_victory ? 'Victory' : 'Loss'}})</span></h3>
+
+                <p ng-repeat="player in matchCtrl.match.players | filter: {radiant: true}">
+                    <a ng-href="/player/{{player.account_id}}">
+                        {{player.steam_player.personaname || 'Unknown'}}
+                        -
+                        {{player.hero_name}}
+                    </a>
+                </p>
+            </div>
+
+            <div class="col-md-6">
+                <h3>Dire <span>({{!matchCtrl.match.radiant_victory ? 'Victory' : 'Loss'}})</span></h3>
+
+                <p ng-repeat="player in matchCtrl.match.players | filter: {radiant: false}">
+                    <a ng-href="/player/{{player.account_id}}">
+                        {{player.steam_player.personaname || 'Unknown'}}
+                        -
+                        {{player.hero_name}}
+                    </a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</div>

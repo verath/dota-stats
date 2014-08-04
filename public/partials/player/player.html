@@ -1,0 +1,115 @@
+<div class="row">
+    <div class="col-xs-12 col-md-3">
+        <p>
+            <img ng-src="{{playerCtrl.player.avatarfull}}" class="img-responsive img-thumbnail">
+        </p>
+
+        <p>
+            <span class="text-primary">{{playerCtrl.player.personaname}}</span>
+            <br>
+            <small>Steam Id: {{playerCtrl.player.steamid32}}</small>
+        </p>
+    </div>
+
+    <div class="col-xs-12 col-md-9">
+        <h2>Recent Matches</h2>
+
+        <div class="row matchSummaryHeader">
+            <!-- Hero Icon + Hero name -->
+            <div class="col-sm-3 hidden-xs d2mh-margin">
+                <strong>Hero</strong>
+                <br>
+                <small>K/D/A</small>
+            </div>
+            <!-- Hero Icon only -->
+            <div class="col-xs-3 hidden-sm hidden-md hidden-lg"><strong>Hero</strong></div>
+
+            <!-- Result -->
+            <div class="col-sm-2 col-xs-4"><strong>Result</strong><br>
+                <small>Played</small>
+            </div>
+
+            <!-- Type -->
+            <div class="col-sm-3 col-xs-5"><strong>Ranked</strong><br>
+                <small>Game Type</small>
+            </div>
+
+            <!-- Duration -->
+            <div class="col-sm-2 hidden-xs"><strong>Duration</strong><br>
+                <small>Faction</small>
+            </div>
+
+            <!-- GPM/XMP -->
+            <div class="col-sm-2 hidden-xs"><strong>GPM/XPM</strong><br>
+                <small>Gold</small>
+            </div>
+        </div>
+        <div class="row matchSummary ng-animate"
+             ng-repeat="match in playerCtrl.matches | filter:{is_loaded: true} track by match.match_id"
+             ng-class-odd="'odd'"
+             ng-class-even="'even'"
+             ng-click="playerCtrl.goToMatch(match.match_id)">
+
+            <!-- Hero -->
+            <div class="col-xs-3">
+                <i class="d2mh hero-{{match.player.hero_id}}" title="{{match.player.hero_name}}"></i>
+                <span class="hidden-xs text-primary">{{match.player.hero_name}}</span>
+                <br>
+                <small class="hidden-xs">
+                    <span class="kills">{{match.player.kills}}</span>/<span
+                        class="deaths">{{match.player.deaths}}</span>/<span
+                        class="assists">{{match.player.assists}}</span>
+                </small>
+            </div>
+
+            <!-- Result -->
+            <div class="col-sm-2 col-xs-4">
+                <span ng-class="{'text-success': player.winning_team, 'text-danger':!player.winning_team}">
+                    {{match.player.winning_team ? 'Win' : 'Loss'}}
+                </span>
+                <br>
+                <small><span am-time-ago="(match.start_time+match.duration)" am-preprocess="unix"></span></small>
+            </div>
+
+            <!-- Ranked -->
+            <div class="col-sm-3 col-xs-5">
+                <span class="text-primary">{{match.lobby_type == 7 ? 'Ranked' : 'Normal'}}</span>
+                <br>
+                <small>{{match.game_mode_name}}</small>
+            </div>
+
+            <!-- Duration -->
+            <div class="col-sm-2 hidden-xs">
+                 <span class="text-primary">
+                    {{match.duration / 60 | number : 0}}m {{match.duration % 60 | number : 0}}s
+                </span>
+                <br>
+                <small>{{match.player.radiant ? 'Radiant' : 'Dire'}}</small>
+            </div>
+
+            <!-- GPM/XPM -->
+            <div class="col-sm-2 hidden-xs">
+                <span class="text-primary">
+                    <span class="gpm">{{match.player.gold_per_min}}</span>/<span
+                        class="xpm">{{match.player.xp_per_min}}</span>
+                </span>
+                <br>
+                <small>{{match.player.gold}}</small>
+            </div>
+
+        </div>
+        <button type="button"
+                ng-show="playerCtrl.hasMoreMatches"
+                class="btn btn-primary btn-block ladda-button loadMoreMatches"
+                data-style="expand-right"
+                ng-click="playerCtrl.loadMoreMatches()"
+                ng-class="{'btn-danger':playerCtrl.loadingMatchesError,'btn-primary':!playerCtrl.loadingMatchesError}"
+                ng-disabled="playerCtrl.isLoadingMatches || playerCtrl.loadingMatchesError"
+                data-ui-ladda="playerCtrl.isLoadingMatches">
+                    <span class="ladda-label">
+                        {{playerCtrl.loadingMatchesError ? 'Error Loading Matches' : 'Load More'}}
+                    </span>
+        </button>
+    </div>
+
+</div>
