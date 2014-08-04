@@ -4,11 +4,15 @@ var path = require('path');
 var express = require('express');
 var redis = require('redis');
 var Q = require('q');
-var compression = require('compression')
+var compression = require('compression');
 
 var config = require('./config/config');
 var SteamApi = require('./steam_api');
 var redisClient = redis.createClient(config.REDIS.PORT, config.REDIS.HOST, config.REDIS.OPTIONS);
+
+redisClient.on("error", function (err) {
+    console.log("Redis Error: " + err);
+});
 
 var steamApi = new SteamApi(redisClient);
 var app = module.exports = express();
