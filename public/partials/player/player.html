@@ -64,7 +64,7 @@
 
             <!-- Result -->
             <div class="col-sm-2 col-xs-4">
-                <span ng-class="{'text-success': player.winning_team, 'text-danger':!player.winning_team}">
+                <span ng-class="{'text-success': match.player.winning_team, 'text-danger':!match.player.winning_team}">
                     {{match.player.winning_team ? 'Win' : 'Loss'}}
                 </span>
                 <br>
