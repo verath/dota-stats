@@ -1,5 +1,6 @@
 var http = require('http');
 var path = require('path');
+var url = require('url');
 
 var express = require('express');
 var redis = require('redis');
@@ -12,11 +13,14 @@ try {
 } catch (e) {
 }
 var SteamApi = require('./steam_api');
-var redisClient = redis.createClient(
-    config.REDIS_PORT || process.env.REDIS_PORT,
-    config.REDIS_HOST || process.env.REDIS_HOST,
-    config.REDIS_OPTIONS || process.env.REDIS_OPTIONS );
-
+var redisClient;
+if(process.env.REDISCLOUD_URL) {
+    var redisURL = url.parse(process.env.REDISCLOUD_URL);
+    redisClient = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
+    redisClient.auth(redisURL.auth.split(":")[1]);
+} else {
+    redisClient = redis.createClient(config.REDIS_PORT, config.REDIS_HOST, config.REDIS_OPTIONS);
+}
 redisClient.on("error", function (err) {
     console.log("Redis Error: " + err);
 });
