@@ -5,7 +5,6 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "postinstall": "bower install",
     "prestart": "node ./node_modules/coffee-script/bin/coffee --compile --map --join ./public/app.all.js ./public/src",
     "start": "node ./app/app.js"
   },
