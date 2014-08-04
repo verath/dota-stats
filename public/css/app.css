@@ -3,6 +3,10 @@ body {
     padding-bottom: 60px;
 }
 
+body.no-js .hide-no-js, body.js .hide-js {
+    display: none !important;
+}
+
 .form-player-id {
     max-width: 330px;
     padding: 15px;
@@ -103,8 +107,6 @@ body {
 .matchSummary.ng-enter.ng-enter-active {
     opacity:1;
 }
-
-
 
 button.loadMoreMatches {
     margin-top: 10px;

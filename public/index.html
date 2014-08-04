@@ -23,7 +23,7 @@
     <!-- Dota2 Minimap Hero Sprites https://github.com/bontscho/dota2-minimap-hero-sprites -->
     <link rel="stylesheet" href="/lib/dota2-minimap-hero-sprites/assets/stylesheets/dota2minimapheroes.css">
 </head>
-<body>
+<body class="no-js">
 
 <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
     <div class="container">
@@ -45,7 +45,18 @@
     </div>
 </div>
 
-<div id="loadingOverlay" class="fade-out ng-cloak" ng-show="appCtrl.loading.isLoading">
+<noscript>
+    <div class="container fade-in hide-js text-center">
+        <div class="row">
+            <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
+                <h1>No Javascript Detected</h1>
+                <p>Please <a href="http://www.enable-javascript.com/">Enable Javascript</a> in your browser.</p>
+            </div>
+        </div>
+    </div>
+</noscript>
+
+<div id="loadingOverlay" class="fade-out ng-cloak hide-no-js" ng-show="appCtrl.loading.isLoading">
     <h1>Loading...</h1>
 
     <div class="spinner">
@@ -56,6 +67,9 @@
         <div class="rect5"></div>
     </div>
 </div>
+
+<!-- Detect JS -->
+<script>document.body.className = document.body.className.replace('no-js', 'js');</script>
 
 <!-- jQuery -->
 <script src="/bower_components/jquery/dist/jquery.min.js"></script>
