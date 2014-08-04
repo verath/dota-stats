@@ -7,3 +7,4 @@ tmp
 .idea
 app/config/config.js
 public/app.*
+npm-debug.log
