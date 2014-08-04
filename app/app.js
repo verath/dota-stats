@@ -4,6 +4,7 @@ var path = require('path');
 var express = require('express');
 var redis = require('redis');
 var Q = require('q');
+var compression = require('compression')
 
 var config = require('./config/config');
 var SteamApi = require('./steam_api');
@@ -12,8 +13,14 @@ var redisClient = redis.createClient(config.REDIS.PORT, config.REDIS.HOST, confi
 var steamApi = new SteamApi(redisClient);
 var app = module.exports = express();
 
+// Miliseconds in a day. Used to cache the static content
+var oneDay = 86400000;
+
+// use gzip
+app.use(compression());
+
 // Serve public site as static files
-app.use('/', express.static(path.join(__dirname, '../public')));
+app.use('/', express.static(path.join(__dirname, '../public'), {maxAge: oneDay}));
 
 // Api methods
 app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, next) {
