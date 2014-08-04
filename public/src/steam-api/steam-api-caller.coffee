@@ -46,6 +46,8 @@ callerModule.service 'steamApiCaller',
       validateCallback: (data, resolve, reject) ->
         if data['result']?['status'] == 1
           resolve(data['result'])
+        else if data['result']?['statusDetail']?
+          reject(data['result']['statusDetail'] + ".")
         else
           reject()
     }
@@ -96,8 +98,10 @@ callerModule.service 'steamApiCaller',
           apiReqDefer = @$q.defer();
           @$http.get(url + queryString, {cache: cache})
           .success (data) =>
-            validateCallback data, apiReqDefer.resolve, () ->
-              apiReqDefer.reject(new Error('Received unexpected results from the Steam API'))
+            validateCallback data, apiReqDefer.resolve, (err) ->
+              if not err?
+                err = new Error('Received unexpected results from the Steam API')
+              apiReqDefer.reject(err)
           .error (err) ->
             apiReqDefer.reject(err)
 

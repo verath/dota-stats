@@ -47,12 +47,12 @@ ctrls.controller "ViewHomeCtrl", class ViewHomeCtrl
 ctrls.controller "ViewPlayerCtrl", class ViewPlayerCtrl
   REFRESH_MATCHES_INTERVAL = 2 * 60 * 1000
 
-  # Matches that we are loading details for
-  matches: []
   # The player we are viewing
   player: {}
+  # Matches that we are loading details for
+  matches: []
   # Flag for if we are currently loading more matches
-  isLoadingMatches: true
+  matchLoadProgress: true
   # Flag for if there was an error loading matches
   loadingMatchesError: false
   # Flag for if we have more matches to load
@@ -66,14 +66,19 @@ ctrls.controller "ViewPlayerCtrl", class ViewPlayerCtrl
 
     @player = playerData.player
     @matches = @filterMatchesByPlayer(playerData.matchData.matches, @player.steamid32)
-    @isLoadingMatches = true
-    @hasMoreMatches = (playerData.matchData.meta.results_remaining > 0)
+    @matchLoadProgress = 0
     @loadingMatchesError = false
+    @hasMoreMatches = (playerData.matchData.meta.results_remaining > 0)
 
-    # Wait for loading of matches before allowing loading more
-    $q.all(_.invoke(@matches, 'loadDetails')).then () =>
-      this.isLoadingMatches = false
-      # Refresh matches every 1 min
+    matchLoadPromises = _.invoke(@matches, 'loadDetails')
+    # Whenever details are loaded for a match, increase the progressbar
+    @_.forEach(matchLoadPromises, (matchPromise) =>
+      matchPromise.then () => @matchLoadProgress += 1/matchLoadPromises.length
+    )
+    # Wait for loading of matches all pending before allowing loading more
+    $q.all(matchLoadPromises).then () =>
+      this.matchLoadProgress = false
+      # Refresh matches REFRESH_MATCHES_INTERVAL
       @refreshMatchTimeout = $timeout(() =>
         @refreshMatches()
       , REFRESH_MATCHES_INTERVAL)
@@ -91,28 +96,37 @@ ctrls.controller "ViewPlayerCtrl", class ViewPlayerCtrl
       return match
     )
 
-
   # Method for loading more matches later than the current loaded ones
   loadMoreMatches: () ->
-    if !@isLoadingMatches
-      @isLoadingMatches = true
+    if @matchLoadProgress == false
+      @matchLoadProgress = 0
       lastMatchId = @_.last(this.matches).match_id
       @player.getMatches(10, (lastMatchId - 1)).then (matchData) =>
-        @$q.all(@_.invoke(matchData.matches, 'loadDetails')).then () =>
+        # loadDetails for each of the matches
+        matchLoadPromises = @_.invoke(matchData.matches, 'loadDetails')
+        # Whenever details are loaded for a match, increase the progressbar
+        @_.forEach(matchLoadPromises, (matchPromise) =>
+          matchPromise.then () => @matchLoadProgress += 1/matchLoadPromises.length
+        )
+        @$q.all(matchLoadPromises)
+        .then () =>
+          # When all matches has finished loaded, append them to the list
           filteredMatches = @filterMatchesByPlayer(matchData.matches, @player.steamid32)
           @matches = @matches.concat(filteredMatches)
           @hasMoreMatches = (matchData.meta.results_remaining > 0)
-          @isLoadingMatches = false
+          @matchLoadProgress = false
         .catch () =>
+          # If there was an error loading any of the matches, throw all away.
+          # (successful calls should be cached anyway, so doesn't matter much)
           @loadingMatchesError = true
           @$timeout(() =>
             @loadingMatchesError = false
-            @isLoadingMatches = false
+            @matchLoadProgress = false
           , 3000)
 
   # Method for refreshing the first few match
   refreshMatches: () ->
-    @player.getMatches(5, null, false)
+    @player.getMatches(10, null, false)
     .then (matchData) =>
       highMatchId = @matches[0].match_id
       newMatches = @_.filter(matchData.matches, (match) ->
@@ -143,7 +157,8 @@ ctrls.factory "ViewPlayerCtrlResolve", ($route, $q, $location, _, steamApi) ->
       $location.replace()
       return $q.reject('Redirect')
 
-    $q.all([player.getMatches(10, null, false), player.loadSummary()]).then (result) ->
+    $q.all([player.getMatches(10, null, false), player.loadSummary()])
+    .then (result) ->
       matchData = result[0]
       matches = matchData.matches
       matchDetailRequests = []
@@ -156,7 +171,6 @@ ctrls.factory "ViewPlayerCtrlResolve", ($route, $q, $location, _, steamApi) ->
 
       $q.all(matchDetailRequests).then () ->
         {matchData: matchData, player: player}
-
 
 # /match/:matchId
 ctrls.controller "ViewMatchCtrl", class ViewMatchCtrl

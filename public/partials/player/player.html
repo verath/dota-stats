@@ -104,8 +104,8 @@
                 data-style="expand-right"
                 ng-click="playerCtrl.loadMoreMatches()"
                 ng-class="{'btn-danger':playerCtrl.loadingMatchesError,'btn-primary':!playerCtrl.loadingMatchesError}"
-                ng-disabled="playerCtrl.isLoadingMatches || playerCtrl.loadingMatchesError"
-                data-ui-ladda="playerCtrl.isLoadingMatches">
+                ng-disabled="playerCtrl.matchLoadProgress || playerCtrl.loadingMatchesError"
+                data-ui-ladda="playerCtrl.matchLoadProgress">
                     <span class="ladda-label">
                         {{playerCtrl.loadingMatchesError ? 'Error Loading Matches' : 'Load More'}}
                     </span>
