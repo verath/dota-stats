@@ -6,7 +6,11 @@ var redis = require('redis');
 var Q = require('q');
 var compression = require('compression');
 
-var config = require('./config/config');
+var config = {};
+try {
+    config = require('./config/config');
+} catch (e) {
+}
 var SteamApi = require('./steam_api');
 var redisClient = redis.createClient(config.REDIS.PORT, config.REDIS.HOST, config.REDIS.OPTIONS);
 
@@ -37,7 +41,7 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
         .done(function (result) {
             res.send(result);
         }, function (err) {
-            if(err instanceof Error) {
+            if (err instanceof Error) {
                 next(err)
             } else {
                 next(new Error(err));
@@ -46,7 +50,7 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
 });
 
 // This route deals enables HTML5Mode by forwarding missing files to the index.html
-app.all('/*', function(req, res) {
+app.all('/*', function (req, res) {
     res.sendfile(path.join(__dirname, '../public/index.html'));
 });
 
@@ -60,7 +64,7 @@ app.use(function (req, res, next) {
 
 /// error handler
 app.use(function (err, req, res, next) {
-    if(!err.status || err.status >= 500) {
+    if (!err.status || err.status >= 500) {
         // An error on our end, log the stack
         console.error(err.stack);
     }
@@ -81,14 +85,14 @@ app.set('port', process.env.PORT || 3000);
             var runningDefer = Q.defer();
             var server = app.listen(app.get('port'), function () {
                 console.log("Server running on port " + server.address().port + "...");
-            }).on('error', function(err){
+            }).on('error', function (err) {
                 server.close();
                 runningDefer.reject(err);
             });
             return runningDefer.promise;
         })
         .fail(function (err) {
-            if(err) {
+            if (err) {
                 console.error(err.stack);
             }
         })
