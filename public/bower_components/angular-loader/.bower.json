@@ -1,16 +1,16 @@
 {
   "name": "angular-loader",
-  "version": "1.3.0-build.3015+sha.dd2a803",
+  "version": "1.3.0-build.3024+sha.60c13a1",
   "main": "./angular-loader.js",
   "dependencies": {
-    "angular": "1.3.0-build.3015+sha.dd2a803"
+    "angular": "1.3.0-build.3024+sha.60c13a1"
   },
   "homepage": "https://github.com/angular/bower-angular-loader",
-  "_release": "1.3.0-build.3015+sha.dd2a803",
+  "_release": "1.3.0-build.3024+sha.60c13a1",
   "_resolution": {
     "type": "version",
-    "tag": "v1.3.0-build.3015+sha.dd2a803",
-    "commit": "ebab3f04ab98b9182a4517ff921849e73b9666b7"
+    "tag": "v1.3.0-build.3024+sha.60c13a1",
+    "commit": "bc66b59e7151b1d4ee7537784eec8be459cd764f"
   },
   "_source": "git://github.com/angular/bower-angular-loader.git",
   "_target": "1.3.x",

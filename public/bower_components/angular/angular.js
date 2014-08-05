@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.3.0-build.3015+sha.dd2a803
+ * @license AngularJS v1.3.0-build.3024+sha.60c13a1
  * (c) 2010-2014 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -68,7 +68,7 @@ function minErr(module) {
       return match;
     });
 
-    message = message + '\nhttp://errors.angularjs.org/1.3.0-build.3015+sha.dd2a803/' +
+    message = message + '\nhttp://errors.angularjs.org/1.3.0-build.3024+sha.60c13a1/' +
       (module ? module + '/' : '') + code;
     for (i = 2; i < arguments.length; i++) {
       message = message + (i == 2 ? '?' : '&') + 'p' + (i-2) + '=' +
@@ -2070,7 +2070,7 @@ function setupModuleLoader(window) {
  * - `codeName` – `{string}` – Code name of the release, such as "jiggling-armfat".
  */
 var version = {
-  full: '1.3.0-build.3015+sha.dd2a803',    // all of these placeholder strings will be replaced by grunt's
+  full: '1.3.0-build.3024+sha.60c13a1',    // all of these placeholder strings will be replaced by grunt's
   major: 1,    // package task
   minor: 3,
   dot: 0,
@@ -5471,7 +5471,7 @@ function $TemplateCacheProvider() {
  *
  * #### `template`
  * HTML markup that may:
- * * Replace the contents of the directive's element (defualt).
+ * * Replace the contents of the directive's element (default).
  * * Replace the directive's element itself (if `replace` is true - DEPRECATED).
  * * Wrap the contents of the directive's element (if `transclude` is true).
  *
@@ -7275,7 +7275,7 @@ function $CompileProvider($provide, $$sanitizeUriProvider) {
       jqLite(newNode).data(jqLite(firstElementToRemove).data());
 
       // Remove data of the replaced element. We cannot just call .remove()
-      // on the element it since that would deallocate scope and event handlers that are still needed
+      // on the element it since that would deallocate scope that is needed
       // for the new node. Instead, remove the data "manually".
       if (!jQuery) {
         delete jqLite.cache[firstElementToRemove[jqLite.expando]];
@@ -11672,143 +11672,122 @@ function qFactory(nextTick, exceptionHandler) {
    * @returns {Deferred} Returns a new instance of deferred.
    */
   var defer = function() {
-    var pending = [],
-        value, deferred;
+    return new Deferred();
+  };
 
-    deferred = {
+  function Promise () {
+    this.$$pending = [];
+  }
 
-      resolve: function(val) {
-        if (pending) {
-          var callbacks = pending;
-          pending = undefined;
-          value = ref(val);
+  Promise.prototype = {
+    then: function(callback, errback, progressback) {
+      var result = new Deferred();
 
-          if (callbacks.length) {
-            nextTick(function() {
-              var callback;
-              for (var i = 0, ii = callbacks.length; i < ii; i++) {
-                callback = callbacks[i];
-                value.then(callback[0], callback[1], callback[2]);
-              }
-            });
-          }
+      var wrappedCallback = function(value) {
+        try {
+          result.resolve((isFunction(callback) ? callback : defaultCallback)(value));
+        } catch(e) {
+          result.reject(e);
+          exceptionHandler(e);
         }
-      },
+      };
 
-
-      reject: function(reason) {
-        deferred.resolve(createInternalRejectedPromise(reason));
-      },
-
-
-      notify: function(progress) {
-        if (pending) {
-          var callbacks = pending;
-
-          if (pending.length) {
-            nextTick(function() {
-              var callback;
-              for (var i = 0, ii = callbacks.length; i < ii; i++) {
-                callback = callbacks[i];
-                callback[2](progress);
-              }
-            });
-          }
+      var wrappedErrback = function(reason) {
+        try {
+          result.resolve((isFunction(errback) ? errback : defaultErrback)(reason));
+        } catch(e) {
+          result.reject(e);
+          exceptionHandler(e);
         }
-      },
+      };
 
+      var wrappedProgressback = function(progress) {
+        try {
+          result.notify((isFunction(progressback) ? progressback : defaultCallback)(progress));
+        } catch(e) {
+          exceptionHandler(e);
+        }
+      };
 
-      promise: {
-        then: function(callback, errback, progressback) {
-          var result = defer();
+      if (this.$$pending) {
+        this.$$pending.push([wrappedCallback, wrappedErrback, wrappedProgressback]);
+      } else {
+        this.$$value.then(wrappedCallback, wrappedErrback, wrappedProgressback);
+      }
 
-          var wrappedCallback = function(value) {
-            try {
-              result.resolve((isFunction(callback) ? callback : defaultCallback)(value));
-            } catch(e) {
-              result.reject(e);
-              exceptionHandler(e);
+      return result.promise;
+    },
+
+    "catch": function(callback) {
+      return this.then(null, callback);
+    },
+    "finally": function(callback) {
+      return this.then(function(value) {
+        return handleCallback(value, true, callback);
+      }, function(error) {
+        return handleCallback(error, false, callback);
+      });
+    }
+  };
+
+  //Faster, more basic than angular.bind http://jsperf.com/angular-bind-vs-custom-vs-native
+  function simpleBind(context, fn) {
+    return function(value) {
+      fn.call(context, value);
+    };
+  }
+
+  function Deferred () {
+    this.promise = new Promise();
+    //Necessary to support unbound execution :/
+    this.resolve = simpleBind(this, this.resolve);
+    this.reject = simpleBind(this, this.reject);
+    this.notify = simpleBind(this, this.notify);
+  }
+
+  Deferred.prototype = {
+    resolve: function(val) {
+      if (this.promise.$$pending) {
+        var callbacks = this.promise.$$pending;
+        this.promise.$$pending = undefined;
+        this.promise.$$value = ref(val);
+
+        if (callbacks.length) {
+          nextTick(simpleBind(this, function() {
+            var callback;
+            for (var i = 0, ii = callbacks.length; i < ii; i++) {
+              callback = callbacks[i];
+              this.promise.$$value.then(callback[0], callback[1], callback[2]);
             }
-          };
+          }));
+        }
+      }
+    },
+    reject: function(reason) {
+      this.resolve(createInternalRejectedPromise(reason));
+    },
+    notify: function(progress) {
+      if (this.promise.$$pending) {
+        var callbacks = this.promise.$$pending;
 
-          var wrappedErrback = function(reason) {
-            try {
-              result.resolve((isFunction(errback) ? errback : defaultErrback)(reason));
-            } catch(e) {
-              result.reject(e);
-              exceptionHandler(e);
+        if (this.promise.$$pending.length) {
+          nextTick(function() {
+            var callback;
+            for (var i = 0, ii = callbacks.length; i < ii; i++) {
+              callback = callbacks[i];
+              callback[2](progress);
             }
-          };
-
-          var wrappedProgressback = function(progress) {
-            try {
-              result.notify((isFunction(progressback) ? progressback : defaultCallback)(progress));
-            } catch(e) {
-              exceptionHandler(e);
-            }
-          };
-
-          if (pending) {
-            pending.push([wrappedCallback, wrappedErrback, wrappedProgressback]);
-          } else {
-            value.then(wrappedCallback, wrappedErrback, wrappedProgressback);
-          }
-
-          return result.promise;
-        },
-
-        "catch": function(callback) {
-          return this.then(null, callback);
-        },
-
-        "finally": function(callback) {
-
-          function makePromise(value, resolved) {
-            var result = defer();
-            if (resolved) {
-              result.resolve(value);
-            } else {
-              result.reject(value);
-            }
-            return result.promise;
-          }
-
-          function handleCallback(value, isResolved) {
-            var callbackOutput = null;
-            try {
-              callbackOutput = (callback ||defaultCallback)();
-            } catch(e) {
-              return makePromise(e, false);
-            }
-            if (isPromiseLike(callbackOutput)) {
-              return callbackOutput.then(function() {
-                return makePromise(value, isResolved);
-              }, function(error) {
-                return makePromise(error, false);
-              });
-            } else {
-              return makePromise(value, isResolved);
-            }
-          }
-
-          return this.then(function(value) {
-            return handleCallback(value, true);
-          }, function(error) {
-            return handleCallback(error, false);
           });
         }
       }
-    };
-
-    return deferred;
+    }
   };
-
 
   var ref = function(value) {
     if (isPromiseLike(value)) return value;
     return {
       then: function(callback) {
-        var result = defer();
+        var result = new Deferred();
         nextTick(function() {
           result.resolve(callback(value));
         });
@@ -11855,15 +11834,43 @@ function qFactory(nextTick, exceptionHandler) {
    * @returns {Promise} Returns a promise that was already resolved as rejected with the `reason`.
    */
   var reject = function(reason) {
-    var result = defer();
+    var result = new Deferred();
     result.reject(reason);
     return result.promise;
+  };
+
+  var makePromise = function makePromise(value, resolved) {
+    var result = new Deferred();
+    if (resolved) {
+      result.resolve(value);
+    } else {
+      result.reject(value);
+    }
+    return result.promise;
+  };
+
+  var handleCallback = function handleCallback(value, isResolved, callback) {
+    var callbackOutput = null;
+    try {
+      callbackOutput = (callback ||defaultCallback)();
+    } catch(e) {
+      return makePromise(e, false);
+    }
+    if (isPromiseLike(callbackOutput)) {
+      return callbackOutput.then(function() {
+        return makePromise(value, isResolved);
+      }, function(error) {
+        return makePromise(error, false);
+      });
+    } else {
+      return makePromise(value, isResolved);
+    }
   };
 
   var createInternalRejectedPromise = function(reason) {
     return {
       then: function(callback, errback) {
-        var result = defer();
+        var result = new Deferred();
         nextTick(function() {
           try {
             result.resolve((isFunction(errback) ? errback : defaultErrback)(reason));
@@ -11892,7 +11899,7 @@ function qFactory(nextTick, exceptionHandler) {
    * @returns {Promise} Returns a promise of the passed value or promise
    */
   var when = function(value, callback, errback, progressback) {
-    var result = defer(),
+    var result = new Deferred(),
         done;
 
     var wrappedCallback = function(value) {
@@ -11966,7 +11973,7 @@ function qFactory(nextTick, exceptionHandler) {
    *   with the same rejection value.
    */
   function all(promises) {
-    var deferred = defer(),
+    var deferred = new Deferred(),
         counter = 0,
         results = isArray(promises) ? [] : {};
 
@@ -12000,7 +12007,7 @@ function qFactory(nextTick, exceptionHandler) {
       return new Q(resolver);
     }
 
-    var deferred = defer();
+    var deferred = new Deferred();
 
     function resolveFn(value) {
       deferred.resolve(value);
@@ -16626,9 +16633,8 @@ function FormController(element, attrs, $scope, $animate) {
   };
 
   /**
-   * @ngdoc function
-   * @name ng.directive:form.FormController#$setSubmitted
-   * @methodOf ng.directive:form.FormController
+   * @ngdoc method
+   * @name form.FormController#setSubmitted
    *
    * @description
    * Sets the form to its submitted state.
@@ -20239,10 +20245,16 @@ var ngCloakDirective = ngDirective({
  *
  * @element ANY
  * @scope
- * @param {expression} ngController Name of a globally accessible constructor function or an
- *     {@link guide/expression expression} that on the current scope evaluates to a
- *     constructor function. The controller instance can be published into a scope property
- *     by specifying `as propertyName`.
+ * @param {expression} ngController Name of a constructor function registered with the current
+ * {@link ng.$controllerProvider $controllerProvider} or an {@link guide/expression expression}
+ * that on the current scope evaluates to a constructor function.
+ *
+ * The controller instance can be published into a scope property by specifying
+ * `ng-controller="as propertyName"`.
+ *
+ * If the current `$controllerProvider` is configured to use globals (via
+ * {@link ng.$controllerProvider#allowGlobals `$controllerProvider.allowGlobals()` }), this may
+ * also be the name of a globally accessible constructor function (not recommended).
  *
  * @example
  * Here is a simple form for editing user contact information. Adding, removing, clearing, and
@@ -23352,6 +23364,7 @@ var selectDirective = ['$compile', '$parse', function($compile,   $parse) {
                   (element = optionTemplate.clone())
                       .val(option.id)
                       .prop('selected', option.selected)
+                      .attr('selected', option.selected)
                       .text(option.label);
                 }
 
