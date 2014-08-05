@@ -32,6 +32,45 @@ ctrls.controller "AppCtrl", class AppCtrl
         this.error.errorMessage = "An unexpected error occurred while loading the page."
 
 
+# Controller for handling the top nav-bar
+ctrls.controller "TopNavbarCtrl", class TopNavbarCtrl
+  # An object for the signed in user
+  user: null
+
+  error: {
+    signIn: false
+  }
+
+  constructor: ($scope, $modal, steamUser) ->
+    @steamUser = steamUser
+
+    steamUser.getUser()
+    .then (user) =>
+      @user = user
+
+    @signInModal = $modal {
+      scope: $scope
+      template: '/partials/modals/sign-in.html'
+      container: 'body'
+      show: false
+    }
+
+  showSignInModal: () ->
+    @error.signIn = 'Unexpected Error occured!'
+    @signInModal.$promise.then(@signInModal.show);
+
+  signIn: () ->
+    @steamUser.signIn()
+    .then (steamPlayer) =>
+      @signInModal.$promise.then(@signInModal.hide);
+      @user = steamPlayer
+    .catch (err) =>
+      @error.signIn = err
+
+  signOut: () ->
+    @steamUser.signOut()
+    @user = null
+
 # "/"
 ctrls.controller "ViewHomeCtrl", class ViewHomeCtrl
   @isSearching = false

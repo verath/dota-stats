@@ -1,0 +1,41 @@
+<div class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="$hide()">&times;</button>
+                <h4 class="modal-title">Sign In</h4>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info" role="alert">
+                    <p>Signing in lets us find your Steam user id to provide direct access to your player profile.</p>
+                </div>
+
+                <div class="alert alert-danger" role="alert" ng-show="navCtrl.error.signIn">
+                    <button type="button" class="close" data-dismiss="alert">
+                        <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+                    </button>
+                    <p>
+                        <strong>An error occurred while signing in via Steam!</strong>
+                        <br>
+                        {{navCtrl.error.signIn}}
+                    </p>
+                    <p>Please make sure that your profile and dota match history is not hidden.</p>
+                </div>
+
+
+                <p>
+                    Please click the button below to sign in using your Steam account.
+                </p>
+
+                <p>
+                    <a href="#" ng-click="navCtrl.signIn()">
+                        <img src="http://steamcommunity-a.akamaihd.net/public/images/signinthroughsteam/sits_large_noborder.png">
+                    </a>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="$hide()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

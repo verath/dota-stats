@@ -3,14 +3,16 @@
 app = angular.module 'myApp', [
   'ngRoute'
   'ngAnimate'
-  'steamApi'
   'lodash'
-  'myApp.services'
-  'myApp.directives'
-  'myApp.controllers'
   'ui.ladda'
   'focusOn'
   'angularMoment'
+  'mgcrea.ngStrap'
+  'LocalForageModule'
+  'steamApi'
+  'myApp.services'
+  'myApp.directives'
+  'myApp.controllers'
 ]
 
 app.config ($routeProvider, $locationProvider) ->

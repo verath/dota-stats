@@ -14,6 +14,9 @@
     <!-- Bootstrap-ladda -->
     <link rel="stylesheet" href="/bower_components/ladda-bootstrap/dist/ladda-themeless.min.css">
 
+    <!-- AngularMotion -->
+    <link rel="stylesheet" href="bower_components/angular-motion/dist/angular-motion.min.css">
+
     <!-- App styles -->
     <link rel="stylesheet" href="/css/app.css"/>
 
@@ -25,10 +28,43 @@
 </head>
 <body class="no-js">
 
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+<div id="top-navbar"
+     class="navbar navbar-inverse navbar-fixed-top"
+     role="navigation"
+     ng-controller="TopNavbarCtrl as navCtrl"
+     bs-navbar>
     <div class="container">
         <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
             <a class="navbar-brand" href="/">Dota 2 Stats</a>
+        </div>
+        <div class="collapse navbar-collapse" id="navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li data-match-route="^/$">
+                    <a href="/">Home</a>
+                </li>
+                <li data-match-route="/player/{{navCtrl.user.steamid64}}" ng-show="navCtrl.user">
+                    <a href="/player/{{navCtrl.user.steamid64}}">Your Profile</a>
+                </li>
+            </ul>
+
+            <form class="navbar-form navbar-right" ng-show="!navCtrl.user">
+                <button type="submit"
+                        class="btn btn-primary"
+                        ng-click="navCtrl.showSignInModal()">
+                    <span class="glyphicon glyphicon-user"></span> Sign In
+                </button>
+            </form>
+
+            <p class="navbar-right navbar-text" ng-show="navCtrl.user">
+               Signed in as {{navCtrl.user.personaname}} &mdash; <a href="#" class="navbar-link" ng-click="navCtrl.signOut()">Sign Out</a>
+            </p>
+
         </div>
     </div>
 </div>
@@ -37,7 +73,7 @@
 <div class="container" ng-view ng-hide="appCtrl.loading.isLoading || appCtrl.error.isError">
 </div>
 
-<div class="container fade-in" ng-show="appCtrl.error.isError" >
+<div class="container fade-in" ng-show="appCtrl.error.isError">
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <error error-text="{{appCtrl.error.errorMessage}}"></error>
@@ -50,7 +86,9 @@
         <div class="row">
             <div class="col-sm-6 col-md-4 col-md-offset-4 col-sm-offset-3">
                 <h1>No Javascript Detected</h1>
-                <p>Please <a href="http://www.enable-javascript.com/" target="_blank">Enable Javascript</a> in your browser.</p>
+
+                <p>Please <a href="http://www.enable-javascript.com/" target="_blank">Enable Javascript</a> in your
+                    browser.</p>
             </div>
         </div>
     </div>
@@ -98,6 +136,15 @@
 
 <!-- angular focus-on -->
 <script src="/bower_components/ng-focus-on/ng-focus-on.min.js"></script>
+
+<!-- angular-strap -->
+<script src="/bower_components/angular-strap/dist/angular-strap.min.js"></script>
+<script src="/bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
+
+<!-- angular-localForage -->
+<script src="/bower_components/localforage/dist/localforage.min.js"></script>
+<script src="/bower_components/angular-localforage/dist/angular-localForage.min.js"></script>
+
 
 <!-- app -->
 <script src="/app.all.js"></script>
