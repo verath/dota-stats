@@ -56,7 +56,6 @@ ctrls.controller "TopNavbarCtrl", class TopNavbarCtrl
     }
 
   showSignInModal: () ->
-    @error.signIn = 'Unexpected Error occured!'
     @signInModal.$promise.then(@signInModal.show);
 
   signIn: () ->
