@@ -1,4 +1,4 @@
-if(process.env.NODETIME_ACCOUNT_KEY) {
+if (process.env.NODETIME_ACCOUNT_KEY) {
     require('nodetime').profile({
         accountKey: process.env.NODETIME_ACCOUNT_KEY,
         appName: 'dota-stats' // optional
@@ -30,7 +30,7 @@ try {
 
 // Redis
 var redisClient;
-if(process.env.REDISCLOUD_URL) {
+if (process.env.REDISCLOUD_URL) {
     var redisURL = url.parse(process.env.REDISCLOUD_URL);
     redisClient = redis.createClient(redisURL.port, redisURL.hostname, {no_ready_check: true});
     redisClient.auth(redisURL.auth.split(":")[1]);
@@ -42,7 +42,7 @@ redisClient.on("error", function (err) {
 });
 
 // OpenId Steam Sign-in
-var siteUrl = config.SITE_URL || process.env.SITE_URL
+var siteUrl = config.SITE_URL || process.env.SITE_URL;
 var relyingParty = new openid.RelyingParty(
     url.resolve(siteUrl, '/verify'),// Verify URL
     siteUrl,                        // Realm
@@ -81,8 +81,8 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
 });
 
 // OpenId authenticate
-app.get('/authenticate', function(req, res, next) {
-    relyingParty.authenticate('http://steamcommunity.com/openid', false, function(error, authUrl) {
+app.get('/authenticate', function (req, res, next) {
+    relyingParty.authenticate('http://steamcommunity.com/openid', false, function (error, authUrl) {
         if (error) {
             res.writeHead(200);
             res.end('Authentication failed: ' + error.message);
@@ -97,18 +97,18 @@ app.get('/authenticate', function(req, res, next) {
 });
 
 // OpenId Verify
-app.get('/verify', function(req, res, next) {
-    relyingParty.verifyAssertion(req, function(error, result) {
+app.get('/verify', function (req, res, next) {
+    relyingParty.verifyAssertion(req, function (error, result) {
         try {
             var resultJson = JSON.stringify({error: error, result: result});
-        } catch(err) {
+        } catch (err) {
             next(err);
             return
         }
         res.send(
-            "<html><head><script>" +
+                "<html><head><script>" +
                 "window.opener.handleVerifyOpenId('" + resultJson + "');window.close();" +
-            "</script></head></html>"
+                "</script></head></html>"
         );
 
     });
