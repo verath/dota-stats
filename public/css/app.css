@@ -7,6 +7,10 @@ body.no-js .hide-no-js, body.js .hide-js {
     display: none !important;
 }
 
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none !important;
+}
+
 .form-player-id {
     max-width: 330px;
     padding: 15px;
