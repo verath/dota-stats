@@ -49,6 +49,5 @@
   },
   "_source": "git://github.com/ocombe/angular-localForage.git",
   "_target": "~0.2.9",
-  "_originalSource": "angular-localforage",
-  "_direct": true
+  "_originalSource": "angular-localforage"
 }
