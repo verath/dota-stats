@@ -5,21 +5,30 @@ if(process.env.NODETIME_ACCOUNT_KEY) {
     });
 }
 
+// Built-in Node modules
 var http = require('http');
 var path = require('path');
+var querystring = require('querystring');
 var url = require('url');
 
+// Library modules
+var openid = require('openid');
 var express = require('express');
 var redis = require('redis');
 var Q = require('q');
 var compression = require('compression');
 
+// App modules
+var SteamApi = require('./steam_api');
+
+// Config
 var config = {};
 try {
     config = require('./config/config');
 } catch (e) {
 }
-var SteamApi = require('./steam_api');
+
+// Redis
 var redisClient;
 if(process.env.REDISCLOUD_URL) {
     var redisURL = url.parse(process.env.REDISCLOUD_URL);
@@ -32,15 +41,23 @@ redisClient.on("error", function (err) {
     console.log("Redis Error: " + err);
 });
 
+// OpenId Steam Sign-in
+var siteUrl = config.SITE_URL || process.env.SITE_URL
+var relyingParty = new openid.RelyingParty(
+    url.resolve(siteUrl, '/verify'),// Verify URL
+    siteUrl,                        // Realm
+    true,                           // Stateless verification
+    false,                          // Strict mode
+    []);                            // Extensions to enable and include
+
+
 var steamApi = new SteamApi(redisClient);
 var app = module.exports = express();
-
-// Miliseconds in a day. Used to cache the static content
-var oneDay = 86400000;
 
 // use gzip
 app.use(compression());
 
+var oneDay = 86400000;
 // Serve public site as static files
 app.use('/', express.static(path.join(__dirname, '../public'), {maxAge: oneDay}));
 
@@ -61,6 +78,40 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
                 next(new Error(err));
             }
         });
+});
+
+// OpenId authenticate
+app.get('/authenticate', function(req, res, next) {
+    relyingParty.authenticate('http://steamcommunity.com/openid', false, function(error, authUrl) {
+        if (error) {
+            res.writeHead(200);
+            res.end('Authentication failed: ' + error.message);
+        } else if (!authUrl) {
+            res.writeHead(200);
+            res.end('Authentication failed');
+        } else {
+            res.writeHead(302, { Location: authUrl });
+            res.end();
+        }
+    });
+});
+
+// OpenId Verify
+app.get('/verify', function(req, res, next) {
+    relyingParty.verifyAssertion(req, function(error, result) {
+        try {
+            var resultJson = JSON.stringify({error: error, result: result});
+        } catch(err) {
+            next(err);
+            return
+        }
+        res.send(
+            "<html><head><script>" +
+                "window.opener.handleVerifyOpenId('" + resultJson + "');window.close();" +
+            "</script></head></html>"
+        );
+
+    });
 });
 
 // This route deals enables HTML5Mode by forwarding missing files to the index.html
