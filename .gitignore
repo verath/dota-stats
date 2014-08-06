@@ -7,3 +7,4 @@ tmp
 app/config/config.js
 public/app.*
 npm-debug.log
+public/build
