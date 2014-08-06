@@ -5,7 +5,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "prestart": "node ./node_modules/gulp/bin/gulp.js",
+    "prestart": "gulp",
     "start": "node ./app/app.js"
   },
   "dependencies": {
