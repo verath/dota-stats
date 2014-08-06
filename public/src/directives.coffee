@@ -2,15 +2,15 @@
 
 directives = angular.module('myApp.directives', [])
 
-directives.directive 'error', ($route, $rootScope, $location) ->
-  {
-    scope: {
+directives.directive 'error', ['$route', '$rootScope', '$location',
+  ($route, $rootScope, $location) ->
+    scope:
       'errorText': '@'
-    },
-    restrict: 'E',
-    templateUrl: '/partials/directives/error.html',
+    restrict: 'E'
+    templateUrl: '/partials/directives/error.html'
     link: (scope) ->
-      scope.retry = () -> $route.reload()
+      scope.retry = () ->
+        $route.reload()
 
       history = []
 
@@ -22,4 +22,4 @@ directives.directive 'error', ($route, $rootScope, $location) ->
           $location.path(history.splice(-1)[0])
         else
           $location.path('/')
-  }
+]

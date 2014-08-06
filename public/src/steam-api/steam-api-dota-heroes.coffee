@@ -1,25 +1,21 @@
-angular.module('steamApi.dota.heroes', [])
-.service 'steamApiDotaHeroes',
-  class SteamApiDotaHeroes
 
-    constructor: ($q, steamApiCaller) ->
-      @$q = $q
-      @steamApiCaller = steamApiCaller
+angular.module('steamApi.dota.heroes', [])
+.factory 'steamApiDotaHeroes', ['$q', 'steamApiCaller',
+  ($q, steamApiCaller) ->
+    new class SteamApiDotaHeroes
       @_heroes = null
 
-    loadHeroes: () ->
-      if @_heroes
-        return @$q.when(true)
-      else
-        @steamApiCaller.getHeroes({language: 'en'})
-          .then (heroes) =>
-            @_heroes = {}
-            for hero in heroes
-              @_heroes[hero.id] = hero
-            true
+      loadHeroes: () ->
+        if @_heroes
+          $q.when(true)
+        else
+          steamApiCaller.getHeroes({language: 'en'})
+            .then (heroes) =>
+              @_heroes = {}
+              for hero in heroes
+                @_heroes[hero.id] = hero
+              true
 
-    getHeroById: (heroId) ->
-      if @_heroes?.hasOwnProperty(heroId)
-        @_heroes[heroId]
-      else
-        null
+      getHeroById: (heroId) ->
+        if @_heroes?[heroId]? then @_heroes[heroId] else null
+]

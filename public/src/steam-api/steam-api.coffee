@@ -6,13 +6,12 @@ steamApiModule = angular.module('steamApi', [
   'steamApi.dota.heroes'
 ])
 
-steamApiModule.service 'steamApi',
-  class SteamApi
+steamApiModule.factory 'steamApi', ['SteamPlayer', 'SteamDotaMatch',
+  (SteamPlayer, SteamDotaMatch) ->
+    new class SteamApi
+      getPlayer: (steamId) ->
+        new SteamPlayer(steamId)
 
-    constructor: (SteamPlayer, SteamDotaMatch) ->
-      @SteamPlayer = SteamPlayer
-      @SteamDotaMatch = SteamDotaMatch
-
-    getPlayer: (steamId) -> new @SteamPlayer(steamId)
-
-    getMatch: (matchId) -> new @SteamDotaMatch(matchId)
+      getMatch: (matchId) ->
+        new SteamDotaMatch(matchId)
+]
