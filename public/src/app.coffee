@@ -10,6 +10,8 @@ app = angular.module 'myApp', [
   'mgcrea.ngStrap'
   'LocalForageModule'
   'steamApi'
+  'angulartics'
+  'angulartics.google.analytics'
   'myApp.services'
   'myApp.directives'
   'myApp.controllers'
