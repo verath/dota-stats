@@ -45,18 +45,18 @@
                 <li data-match-route="^/$">
                     <a href="/">Home</a>
                 </li>
-                <li data-match-route="/player/{{navCtrl.user.steamid64}}" ng-show="navCtrl.user">
+                <li data-match-route="/player/{{navCtrl.user.steamid64}}" ng-show="navCtrl.user" class="hide-no-js">
                     <a href="/player/{{navCtrl.user.steamid64}}">Your Profile</a>
                 </li>
             </ul>
-            <form class="navbar-form navbar-right" ng-show="!navCtrl.user">
+            <form class="navbar-form navbar-right hide-no-js" ng-show="!navCtrl.user">
                 <button type="submit"
                         class="btn btn-primary"
                         ng-click="navCtrl.showSignInModal()">
                     <span class="glyphicon glyphicon-user"></span> Sign In
                 </button>
             </form>
-            <p class="navbar-right navbar-text ng-hide" ng-show="navCtrl.user">
+            <p class="navbar-right navbar-text ng-hide hide-no-js" ng-show="navCtrl.user">
                 Signed in as {{navCtrl.user.personaname}} &mdash;
                 <a href="#" class="navbar-link" ng-click="navCtrl.signOut()">Sign Out</a>
             </p>
