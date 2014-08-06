@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp" ng-controller="AppCtrl as appCtrl">
+<html lang="en" ng-app="myApp" ng-controller="AppCtrl as appCtrl" ng-strict-di>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,24 +7,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Dota 2 Stats</title>
-
-    <!-- Bootstrap -->
-    <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/superhero/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap-ladda -->
-    <link rel="stylesheet" href="/bower_components/ladda-bootstrap/dist/ladda-themeless.min.css">
-
-    <!-- AngularMotion -->
-    <link rel="stylesheet" href="/bower_components/angular-motion/dist/angular-motion.min.css">
-
-    <!-- App styles -->
-    <link rel="stylesheet" href="/css/app.css"/>
-
-    <!-- Loading spinner style from http://tobiasahlin.com/spinkit/ -->
-    <link rel="stylesheet" href="/css/loading.css"/>
-
-    <!-- Dota2 Minimap Hero Sprites https://github.com/bontscho/dota2-minimap-hero-sprites -->
-    <link rel="stylesheet" href="/lib/dota2-minimap-hero-sprites/assets/stylesheets/dota2minimapheroes.css">
 
     <!-- Google Analytics -->
     <script>
@@ -34,6 +16,12 @@
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
         ga('create', 'UA-20402876-3', 'auto');
     </script>
+
+    <!-- Bootstrap with Bootswatch Superhero theme -->
+    <link href="//maxcdn.bootstrapcdn.com/bootswatch/3.2.0/superhero/bootstrap.min.css" rel="stylesheet">
+
+    <!-- App styles -->
+    <link href="/build/css/all.min.css" rel="stylesheet">
 </head>
 <body class="no-js">
 
@@ -61,7 +49,6 @@
                     <a href="/player/{{navCtrl.user.steamid64}}">Your Profile</a>
                 </li>
             </ul>
-
             <form class="navbar-form navbar-right" ng-show="!navCtrl.user">
                 <button type="submit"
                         class="btn btn-primary"
@@ -69,11 +56,10 @@
                     <span class="glyphicon glyphicon-user"></span> Sign In
                 </button>
             </form>
-
             <p class="navbar-right navbar-text ng-hide" ng-show="navCtrl.user">
-               Signed in as {{navCtrl.user.personaname}} &mdash; <a href="#" class="navbar-link" ng-click="navCtrl.signOut()">Sign Out</a>
+                Signed in as {{navCtrl.user.personaname}} &mdash;
+                <a href="#" class="navbar-link" ng-click="navCtrl.signOut()">Sign Out</a>
             </p>
-
         </div>
     </div>
 </div>
@@ -118,48 +104,26 @@
 <!-- Detect JS -->
 <script>document.body.className = document.body.className.replace('no-js', 'js');</script>
 
-<!-- jQuery -->
-<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+<!-- JQuery -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 
-<!-- Bootstrap plugins -->
-<script src="/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- Bootstrap -->
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 
-<!-- lodash -->
-<script src="/bower_components/lodash/dist/lodash.min.js"></script>
+<!-- Lodash -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js"></script>
 
-<!-- ladda-bootstrap -->
-<script src="/bower_components/ladda-bootstrap/dist/spin.min.js"></script>
-<script src="/bower_components/ladda-bootstrap/dist/ladda.min.js"></script>
+<!-- Angular core -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.17/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.17/angular-route.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.17/angular-animate.min.js"></script>
 
-<!-- angular -->
-<script src="/bower_components/angular/angular.js"></script>
-<script src="/bower_components/angular-route/angular-route.js"></script>
-<script src="/bower_components/angular-animate/angular-animate.js"></script>
+<!-- AngularStrap -->
+<script src="//oss.maxcdn.com/angular.strap/2.0.0/angular-strap.min.js"></script>
+<script src="//oss.maxcdn.com/angular.strap/2.0.0/angular-strap.tpl.min.js"></script>
 
-<!-- angular-moment -->
-<script src="/bower_components/moment/min/moment.min.js"></script>
-<script src="/bower_components/angular-moment/angular-moment.min.js"></script>
-
-<!-- angular ui-ladda -->
-<script src="/lib/ui-ladda/ui-ladda.js"></script>
-
-<!-- angular focus-on -->
-<script src="/bower_components/ng-focus-on/ng-focus-on.min.js"></script>
-
-<!-- angular-strap -->
-<script src="/bower_components/angular-strap/dist/angular-strap.min.js"></script>
-<script src="/bower_components/angular-strap/dist/angular-strap.tpl.min.js"></script>
-
-<!-- angular-localForage -->
-<script src="/bower_components/localforage/dist/localforage.min.js"></script>
-<script src="/bower_components/angular-localforage/dist/angular-localForage.min.js"></script>
-
-<!-- angulartics -->
-<script src="/bower_components/angulartics/dist/angulartics.min.js"></script>
-<script src="/bower_components/angulartics/dist/angulartics-ga.min.js"></script>
-
-<!-- app -->
-<script src="/app.all.js"></script>
+<!-- App + non-cdn dependencies -->
+<script src="/build/js/all.min.js"></script>
 
 </body>
 </html>
