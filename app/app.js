@@ -51,7 +51,7 @@ var relyingParty = new openid.RelyingParty(
     []);                            // Extensions to enable and include
 
 
-var steamApi = new SteamApi(redisClient);
+var steamApi = new SteamApi.SteamApi(redisClient);
 var app = module.exports = express();
 
 // use gzip
@@ -72,7 +72,7 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
         .done(function (result) {
             res.send(result);
         }, function (err) {
-            if (err instanceof Error) {
+            if(err instanceof Error || err instanceof SteamApi.SteamApiError) {
                 next(err)
             } else {
                 next(new Error(err));
@@ -129,8 +129,11 @@ app.use(function (req, res, next) {
 
 /// error handler
 app.use(function (err, req, res, next) {
-    if (!err.status || err.status >= 500) {
-        // An error on our end, log the stack
+    // All errors we want sent to the client will be instance of SteamApiError
+    // a normal Error should indicate it is an error on our side
+    if(err instanceof SteamApi.SteamApiError) {
+        console.log('[' + err.status + '] SteamApiError: ' + err.message);
+    } else {
         console.error(err.stack);
     }
     res.status(err.status || 500);

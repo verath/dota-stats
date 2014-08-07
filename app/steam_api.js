@@ -14,6 +14,24 @@ var VALIDATE_KEY_METHOD = '/IDOTA2Match_570/GetMatchDetails/v1/';
 // URL listing the api methods
 var SUPPORTED_API_LIST_METHOD = '/ISteamWebAPIUtil/GetSupportedAPIList/v0001/';
 
+
+// Error thrown to indicate that an error occurred on Steam's end.
+function SteamApiError (message, status) {
+    this.name = 'SteamApiError';
+    this.message = message;
+    this.status = status || 500;
+    this.stack = (new Error()).stack;
+}
+
+// Error to be returned when the Steam API is busy.
+function SteamApiBusyError() {
+    this.name = 'SteamApiBusyError';
+    this.message = 'The Steam API is busy and was unable to handle the request.';
+    this.status = 503;
+}
+SteamApiBusyError.prototype = Object.create(SteamApiError.prototype);
+
+
 function SteamApi(redisClient) {
     var SECONDS_MINUTE = 60;
     var SECONDS_HOUR = 60 * SECONDS_MINUTE;
@@ -31,6 +49,10 @@ function SteamApi(redisClient) {
     // Delay in milliseconds that must pass between each call to the api.
     var STEAM_API_REQUEST_DELAY = 1000;
 
+    // Delay in milliseconds that must pass between an API call getting a
+    // 503 return and the next API call.
+    var STEAM_API_BUSY_REQUEST_DELAY = 30 * 1000;
+
     // The Steam API key used for requests.
     var apiKey = '';
 
@@ -47,6 +69,12 @@ function SteamApi(redisClient) {
 //        }
     };
 
+    // Timestamp indicating when/if the Steam API was busy (got a 503 http response), we must
+    // not do any API calls until STEAM_API_BUSY_REQUEST_DELAY ms has passed.
+    var steamApiBusyTimestamp = 0;
+
+    // A defer for chaining requests with delay between each.
+    var ApiRequestAwaitDefer = Q.resolve();
 
 
     // Tests if interfaceName, methodName, versionNumber entry exist in the
@@ -59,12 +87,27 @@ function SteamApi(redisClient) {
             );
     };
 
-
-    var awaitDefer = Q.resolve();
+    // Queues an API request to perform as soon as the STEAM_API_REQUEST_DELAY allows.
     var queueApiRequest = function (url) {
+        if ((new Date().getTime() - steamApiBusyTimestamp) < STEAM_API_BUSY_REQUEST_DELAY) {
+            return Q.reject(new SteamApiBusyError());
+        }
+
         var requestDefer = Q.defer();
-        awaitDefer = awaitDefer.then(function() {
-            requestDefer.resolve(q_http.request(url));
+        ApiRequestAwaitDefer = ApiRequestAwaitDefer.then(function () {
+            q_http.request(url).then(function (response) {
+                if (response.status === 503) {
+                    // If you get a 503 Error: the matchmaking server is busy or you exceeded limits.
+                    // Please wait 30 seconds and try again.
+                    steamApiBusyTimestamp = new Date().getTime();
+                    requestDefer.reject(new SteamApiBusyError());
+                } else {
+                    requestDefer.resolve(response);
+                }
+            }, function (err) {
+                requestDefer.reject(err);
+            });
+
             return Q.delay(STEAM_API_REQUEST_DELAY)
         });
         return requestDefer.promise;
@@ -118,7 +161,7 @@ function SteamApi(redisClient) {
                     apiKey = key;
                     return Q.resolve();
                 } else if (response.status === 401) {
-                    return Q.reject(new Error('Invalid API Key.'));
+                    return Q.reject(new SteamApiError('Invalid API Key.', 401));
                 } else {
                     return Q.reject(new Error(
                             'Unexpected HTTP response code "' + response.status +
@@ -189,8 +232,6 @@ function SteamApi(redisClient) {
         // "v00001" -> "1"
         versionNumber = parseInt(versionNumber.replace(/[^-0-9]/g, ''), 10).toString();
 
-        var err;
-
         if (apiMethodExists(interfaceName, methodName, versionNumber)) {
             var methodParams = apiInterfaces[interfaceName][methodName][versionNumber];
             queryParams['key'] = apiKey;
@@ -198,10 +239,9 @@ function SteamApi(redisClient) {
             // Make sure we have all required params before making the request
             for (var paramName in methodParams) {
                 if (!methodParams.hasOwnProperty(paramName)) continue;
+
                 if (!methodParams[paramName].optional && !(paramName in queryParams)) {
-                    err = new Error('Missing required parameter: "' + paramName + '"');
-                    err.status = 400;
-                    return Q.reject(err);
+                    return Q.reject(new SteamApiError('Missing required parameter: "' + paramName + '"', 400));
                 }
             }
 
@@ -220,19 +260,18 @@ function SteamApi(redisClient) {
                             return Q.reject(err);
                         }
                     } else if (response.status === 401) {
-                        var err = new Error('Invalid API Key.');
-                        err.code = 401;
-                        return Q.reject(err);
+                        return Q.reject(new SteamApiError('Invalid API Key.', 401));
                     } else {
                         return Q.reject(new Error('Unexpected HTTP response code "' + response.status + '".'));
                     }
                 })
         } else {
-            err = new Error("The API method specified does not exist.");
-            err.status = 404;
-            return Q.reject(err);
+            return Q.reject(new SteamApiError("The API method specified does not exist.", 404));
         }
     }
 }
 
-module.exports = SteamApi;
+module.exports = {
+    SteamApi: SteamApi,
+    SteamApiError: SteamApiError
+};
