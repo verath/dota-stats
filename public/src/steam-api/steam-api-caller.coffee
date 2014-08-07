@@ -89,7 +89,7 @@ callerModule.factory 'steamApiCaller', ['$http', '$q', 'steamApiCallerCache',
         url = API_METHODS[methodName].url
         validateCallback = API_METHODS[methodName].validateCallback
 
-        (options = {}, cache=true) ->
+        (options = {}, cache = true) ->
           queryString = createQueryString(possibleOptions, options)
 
           if cache
