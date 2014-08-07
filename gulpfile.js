@@ -105,10 +105,12 @@ gulp.task('images', ['clean'], function() {
 });
 
 
-gulp.task('watch', function () {
-    gulp.watch([paths.coffee_scripts, paths.external_scripts], ['scripts']);
-    gulp.watch(paths.styles, ['css']);
-    gulp.watch(paths.images, ['images']);
+gulp.task('watch', ['scripts', 'css', 'images'], function () {
+    var watchPaths = [];
+    for(var path in paths) {
+        watchPaths.push(paths[path]);
+    }
+    gulp.watch(watchPaths, ['scripts', 'css', 'images']);
 });
 
 // The default task (called when you run `gulp` from cli)
