@@ -6,7 +6,9 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Dota 2 Stats</title>
+    <title ng:bind-template="{{(appCtrl.error.isError || !appCtrl.pageTitle) ? 'Dota 2 Stats' : appCtrl.pageTitle}}">
+        Dota 2 Stats
+    </title>
 
     <!-- Google Analytics -->
     <script>

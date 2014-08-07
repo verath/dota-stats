@@ -10,10 +10,13 @@ ctrls.controller "AppCtrl", ['$rootScope', '$location', '$scope', '$timeout',
 
     error: {isError: false, errorMessage: '' }
 
+    pageTitle: null
+
     constructor: ($rootScope, $location, $scope, $timeout) ->
       $rootScope.$on "$routeChangeStart", (event, next, current) =>
-        this.loading.isLoading = true
-        this.error.isError = false
+        @pageTitle = 'Loading...'
+        @loading.isLoading = true
+        @error.isError = false
 
       $rootScope.$on "$routeChangeSuccess", (event, current, previous) =>
         # Next-frame timeout, as without it seems to run before view is fully ready.
@@ -22,15 +25,15 @@ ctrls.controller "AppCtrl", ['$rootScope', '$location', '$scope', '$timeout',
 
       $rootScope.$on "$routeChangeError", (event, current, previous, rejection) =>
         console.error("ROUTE CHANGE ERROR: ", rejection)
-        this.loading.isLoading = false
-        this.error.isError = true
+        @loading.isLoading = false
+        @error.isError = true
 
         if rejection instanceof Error
-          this.error.errorMessage = rejection['message']
+          @error.errorMessage = rejection['message']
         else if angular.isString(rejection)
-          this.error.errorMessage = rejection
+          @error.errorMessage = rejection
         else
-          this.error.errorMessage = "An unexpected error occurred while loading the page."
+          @error.errorMessage = "An unexpected error occurred while loading the page."
 ]
 
 # Controller for handling the top nav-bar
