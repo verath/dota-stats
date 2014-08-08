@@ -25,8 +25,8 @@ angular.module('steamApi.dota.match', [])
       constructor: (matchId) ->
         @_loadPromise = null
         @match_id = matchId
-        @is_loaded = false;
-        @is_loading = false;
+        @is_loaded = false
+        @is_loading = false
 
       loadDetails: () ->
         if @is_loaded

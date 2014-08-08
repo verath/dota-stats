@@ -8,6 +8,7 @@ angular.module('steamApi.player', [])
           steamId = SteamPlayer.steamId32To64(steamId)
         @steamid64 = steamId
         @steamid32 = SteamPlayer.steamId64To32(@steamid64)
+        @is_loaded = false
 
       @steamId64To32 = (steam64Id) ->
         parseInt(steam64Id.substr(3), 10) - 61197960265728 + "";
@@ -20,7 +21,7 @@ angular.module('steamApi.player', [])
         .then (summaries) =>
           if summaries.length == 1
             angular.extend(this, summaries[0])
-            return true
+            @is_loaded = true
 
       getMatches: (numMatches = 5, startAtId = null, cache = true) ->
         steamApiCaller.getMatchHistory({
