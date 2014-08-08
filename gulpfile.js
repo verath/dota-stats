@@ -10,6 +10,7 @@ var merge = require('merge-stream');
 var minifyCSS = require('gulp-minify-css');
 var imagemin = require('gulp-imagemin');
 var replace = require('gulp-replace');
+var plumber = require('gulp-plumber');
 
 var paths = {
     coffee_scripts: ['public/src/**/*.coffee'],
@@ -51,8 +52,11 @@ var paths = {
         // Loading spinner style from http://tobiasahlin.com/spinkit/
         'css/loading.css',
 
-        // App styles
-        'css/app.css'
+        // Shared app styles
+        'css/app.css',
+
+        // Player styles
+        'css/player.css'
     ].map(function (val) {
             // Add "public/" to all paths
             return 'public/' + val;
@@ -67,6 +71,11 @@ var paths = {
         })
 };
 
+var onError = function (err) {
+    gutil.beep();
+    console.log(err.stack);
+};
+
 gulp.task('clean', function (cb) {
     del(['public/build'], cb);
 });
@@ -76,10 +85,11 @@ gulp.task('scripts', ['clean'], function () {
         .pipe(sourcemaps.init({loadMaps: true}));
 
     var appScripts = gulp.src(paths.coffee_scripts)
+        .pipe(plumber({
+            errorHandler: onError
+        }))
         .pipe(sourcemaps.init())
-        .pipe(coffee().on('error', function (err) {
-            gutil.log(err.stack);
-        }));
+        .pipe(coffee());
 
     return merge(extScripts, appScripts)
         .pipe(uglify())
