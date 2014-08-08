@@ -1,6 +1,5 @@
 body {
     padding-top: 70px;
-    padding-bottom: 70px;
 }
 
 body.no-js .hide-no-js, body.js .hide-js {
@@ -9,6 +8,10 @@ body.no-js .hide-no-js, body.js .hide-js {
 
 [ng\:cloak], [ng-cloak], .ng-cloak {
     display: none !important;
+}
+
+.container[ng-view] {
+    padding-bottom: 30px;
 }
 
 .form-player-id {
@@ -30,7 +33,6 @@ body.no-js .hide-no-js, body.js .hide-js {
     padding: 10px;
     font-size: 16px;
 }
-
 
 .form-player-id input[type="text"] {
     margin-bottom: 10px;
@@ -66,56 +68,4 @@ body.no-js .hide-no-js, body.js .hide-js {
 
 .xpm {
     color: #00cdcd;
-}
-
-.matchSummary {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    cursor: pointer;
-}
-.matchSummary.even {
-    background: #34485a;
-}
-.matchSummary:hover {
-    background: #5a3b4a;
-}
-.matchSummaryHeader {
-     border-bottom: 1px solid white;
-     margin-bottom: 5px;
-     padding-bottom: 5px;
- }
-.matchSummary > div, .matchSummaryHeader > div {
-    height: 34px;
-    line-height: 16px;
-    vertical-align: middle;
-    overflow: hidden;
-}
-.matchSummaryHeader .d2mh-margin {
-    margin-left: 34px;
-    margin-right: -34px;
-}
-
-.matchSummary .d2mh{
-    float: left;
-    margin-right: 2px;
-}
-
-.matchSummary .d2mh.hero-0 {
-    background: none;
-}
-
-.matchSummary.ng-enter {
-    transition: opacity 0.5s ease-in-out;
-}
-
-.matchSummary.ng-enter {
-    opacity:0;
-}
-
-.matchSummary.ng-enter.ng-enter-active {
-    opacity:1;
-}
-
-button.loadMoreMatches {
-    margin-top: 10px;
 }
