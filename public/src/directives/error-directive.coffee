@@ -1,8 +1,11 @@
-'use strict';
+#
+# error-directive.coffee
+#
+# A directive for displaying an error message and providing go back/retry options.
+#
 
-directives = angular.module('myApp.directives', [])
-
-directives.directive 'error', ['$route', '$rootScope', '$location',
+angular.module('dotaStats.directives')
+.directive 'error', ['$route', '$rootScope', '$location',
   ($route, $rootScope, $location) ->
     scope:
       'errorText': '@'

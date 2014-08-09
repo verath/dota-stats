@@ -1,5 +1,10 @@
+#
+# steam-api-dota-heroes-service.coffee
+#
+# A service for resolving dota hero ids to their english names.
+#
 
-angular.module('steamApi.dota.heroes', [])
+angular.module('dotaStats.services.steamApi')
 .factory 'steamApiDotaHeroes', ['$q', 'steamApiCaller',
   ($q, steamApiCaller) ->
     new class SteamApiDotaHeroes

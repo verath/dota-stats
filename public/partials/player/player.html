@@ -45,7 +45,7 @@
             </div>
         </div>
         <div class="row matchSummary ng-animate"
-             ng-repeat="match in playerCtrl.matches | filter:{is_loaded: true} track by match.match_id"
+             ng-repeat="match in playerCtrl.matches | filter:{is_loaded: true} | matchPlayer:playerCtrl.player.steamid32 track by match.match_id"
              ng-class-odd="'odd'"
              ng-class-even="'even'"
              ng-click="playerCtrl.goToMatch(match.match_id)">

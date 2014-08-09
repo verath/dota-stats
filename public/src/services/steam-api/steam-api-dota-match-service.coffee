@@ -1,4 +1,11 @@
-angular.module('steamApi.dota.match', [])
+#
+# steam-api-dota-match-service.coffee
+#
+# A service exposing a class for modelling a dota match as returned from the
+# Steam API.
+#
+
+angular.module('dotaStats.services.steamApi')
 .factory 'SteamDotaMatch', ['$q', 'steamApiCaller', 'steamApiDotaHeroes', '_',
   ($q, steamApiCaller, steamApiDotaHeroes, _) ->
     class SteamDotaMatch

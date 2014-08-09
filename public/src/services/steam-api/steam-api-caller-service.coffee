@@ -1,30 +1,12 @@
-callerModule = angular.module('steamApi.caller', [])
+#
+# steam-api-caller-service.coffee
+#
+# A service wrapping the steam api methods.
+#
 
-callerModule.factory 'steamApiCallerCache', ['$q',
-  ($q) ->
-    # Simple in-memory cache
-    new class SteamApiCallerCache
-      constructor: ->
-        @_cache = {}
-
-      getKey = (methodName, args...) ->
-        "apiCaller" + "." + methodName + "__" + args.join('+');
-
-      set: (methodName, args..., value) ->
-        key = getKey(methodName, args)
-        @_cache[key] = value;
-
-      get: (methodName, args...) ->
-        key = getKey(methodName, args)
-        if (entry = @_cache[key])?
-          $q.when(entry)
-        else
-          $q.reject('No cache entry')
-]
-
-
-callerModule.factory 'steamApiCaller', ['$http', '$q', 'steamApiCallerCache',
-  ($http, $q, steamApiCallerCache) ->
+angular.module('dotaStats.services.steamApi')
+.factory 'steamApiCaller', ['$http', '$q', 'steamApiCache',
+  ($http, $q, steamApiCache) ->
     new class SteamApiCaller
 
       API_HOST = '/api'
@@ -93,7 +75,7 @@ callerModule.factory 'steamApiCaller', ['$http', '$q', 'steamApiCallerCache',
           queryString = createQueryString(possibleOptions, options)
 
           if cache
-            cachePromise = steamApiCallerCache.get(methodName, queryString)
+            cachePromise = steamApiCache.get(methodName, queryString)
           else
             cachePromise = $q.reject('')
 
@@ -107,7 +89,7 @@ callerModule.factory 'steamApiCaller', ['$http', '$q', 'steamApiCallerCache',
             .error (err) ->
               apiReqDefer.reject(err)
 
-            steamApiCallerCache.set(methodName, queryString, apiReqDefer.promise)
+            steamApiCache.set(methodName, queryString, apiReqDefer.promise)
             return apiReqDefer.promise
 
       getPlayerSummaries: createSimpleApiMethod('getPlayerSummaries')

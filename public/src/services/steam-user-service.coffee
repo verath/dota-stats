@@ -1,11 +1,13 @@
-'use strict';
+#
+# steam-user-service.coffee
+#
+# Service for representing a steam user, with sign in done via OpenId
+#
 
-services = angular.module('myApp.services', []);
-
-# Service for representing a steam user. Sign in is done via
-# openId
-services.factory 'steamUser', ['$window', '$q', '$localForage', 'steamApi',
+angular.module('dotaStats.services')
+.factory 'steamUser', ['$window', '$q', '$localForage', 'steamApi',
   ($window, $q, $localForage, steamApi) ->
+
     new class SteamUser
 
       constructor: ->

@@ -32,7 +32,14 @@ var paths = {
         'bower_components/angulartics/dist/angulartics-ga.min.js',
 
         // angular ui-ladda
-        'lib/ui-ladda/ui-ladda.js'
+        'ext/ui-ladda/ui-ladda.js',
+
+        // angular lodash provider
+        'ext/lodash/lodash.js',
+
+        // EventEmitter and eventEmitter angular service
+        'bower_components/eventEmitter/EventEmitter.min.js',
+        'ext/eventEmitter/eventEmitter.js'
 
     ].map(function (val) {
             // Add "public/" to all paths
@@ -47,7 +54,7 @@ var paths = {
         'bower_components/angular-motion/dist/angular-motion.min.css',
 
         // Dota2 Minimap Hero Sprites https://github.com/bontscho/dota2-minimap-hero-sprites
-        'lib/dota2-minimap-hero-sprites/assets/stylesheets/dota2minimapheroes.css',
+        'ext/dota2-minimap-hero-sprites/assets/stylesheets/dota2minimapheroes.css',
 
         // Loading spinner style from http://tobiasahlin.com/spinkit/
         'css/loading.css',
@@ -64,7 +71,7 @@ var paths = {
 
     images: [
         // Dota2 Minimap Hero Sprites https://github.com/bontscho/dota2-minimap-hero-sprites
-        'lib/dota2-minimap-hero-sprites/assets/images/minimap_hero_sheet.png'
+        'ext/dota2-minimap-hero-sprites/assets/images/minimap_hero_sheet.png'
     ].map(function (val) {
             // Add "public/" to all paths
             return 'public/' + val;
