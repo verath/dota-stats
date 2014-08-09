@@ -16,7 +16,8 @@ angular.module('dotaStats.services')
         for player in match['players']
           steamPlayer = steamApi.getPlayer(player.account_id)
           player.steam_player = steamPlayer
-          playerSummaryRequests.push(steamPlayer.loadSummary())
+          if not steamPlayer.is_private
+            playerSummaryRequests.push(steamPlayer.loadSummary())
 
         $q.all(playerSummaryRequests).then () ->
           {match: match}

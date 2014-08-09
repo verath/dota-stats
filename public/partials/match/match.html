@@ -4,9 +4,7 @@
             <div class="col-md-12">
                 <h2>
                     Match {{matchCtrl.match.match_id}}
-                    ({{matchCtrl.match.start_time | date:'yyyy-MM-dd HH:mm:ss'}}
-                    -
-                    {{matchCtrl.match.start_time+matchCtrl.match.duration*1000 | date:'HH:mm:ss'}})
+                    <small>{{(matchCtrl.match.start_time + matchCtrl.match.duration)*1000 | amCalendar}}</small>
                 </h2>
             </div>
             <div class="col-md-6">
@@ -18,11 +16,18 @@
                 </h3>
 
                 <p ng-repeat="player in matchCtrl.match.players | filter: {radiant: true}">
-                    <a ng-href="/player/{{player.account_id}}">
+                    <span ng-show="player.steam_player.is_private">
                         {{player.steam_player.personaname || 'Unknown'}}
                         -
                         {{player.hero_name}}
-                    </a>
+                    </span>
+                    <span ng-show="!player.steam_player.is_private">
+                        <a ng-href="/player/{{player.account_id}}">
+                            {{player.steam_player.personaname || 'Unknown'}}
+                            -
+                            {{player.hero_name}}
+                        </a>
+                    </span>
                 </p>
             </div>
 
@@ -35,11 +40,18 @@
                 </h3>
 
                 <p ng-repeat="player in matchCtrl.match.players | filter: {radiant: false}">
-                    <a ng-href="/player/{{player.account_id}}">
+                    <span ng-show="player.steam_player.is_private">
                         {{player.steam_player.personaname || 'Unknown'}}
                         -
                         {{player.hero_name}}
-                    </a>
+                    </span>
+                    <span ng-show="!player.steam_player.is_private">
+                        <a ng-href="/player/{{player.account_id}}">
+                            {{player.steam_player.personaname || 'Unknown'}}
+                            -
+                            {{player.hero_name}}
+                        </a>
+                    </span>
                 </p>
             </div>
 
