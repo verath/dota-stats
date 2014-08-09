@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="myApp" ng-controller="AppCtrl as appCtrl" ng-strict-di>
+<html lang="en" ng-app="dotaStats" ng-controller="AppCtrl as appCtrl" ng-strict-di>
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -30,7 +30,7 @@
 <div id="top-navbar"
      class="navbar navbar-inverse navbar-fixed-top"
      role="navigation"
-     ng-controller="TopNavbarCtrl as navCtrl"
+     ng-controller="UserController as userCtrl"
      bs-navbar>
     <div class="container">
         <div class="navbar-header">
@@ -47,20 +47,20 @@
                 <li data-match-route="^/$">
                     <a href="/">Home</a>
                 </li>
-                <li data-match-route="/player/{{navCtrl.user.steamid64}}" ng-show="navCtrl.user" class="hide-no-js">
-                    <a href="/player/{{navCtrl.user.steamid64}}">Your Profile</a>
+                <li data-match-route="/player/{{userCtrl.user.steamid64}}" ng-show="userCtrl.user" class="hide-no-js">
+                    <a href="/player/{{userCtrl.user.steamid64}}">Your Profile</a>
                 </li>
             </ul>
-            <form class="navbar-form navbar-right hide-no-js" ng-show="!navCtrl.user">
+            <form class="navbar-form navbar-right hide-no-js" ng-show="!userCtrl.user">
                 <button type="submit"
                         class="btn btn-primary"
-                        ng-click="navCtrl.showSignInModal()">
+                        ng-click="userCtrl.showSignInModal()">
                     <span class="glyphicon glyphicon-user"></span> Sign In
                 </button>
             </form>
-            <p class="navbar-right navbar-text ng-hide hide-no-js" ng-show="navCtrl.user">
-                Signed in as {{navCtrl.user.personaname}} &mdash;
-                <a href="#" class="navbar-link" ng-click="navCtrl.signOut()">Sign Out</a>
+            <p class="navbar-right navbar-text ng-hide hide-no-js" ng-show="userCtrl.user">
+                Signed in as {{userCtrl.user.personaname}} &mdash;
+                <a href="#" class="navbar-link" ng-click="userCtrl.signOut()">Sign Out</a>
             </p>
         </div>
     </div>

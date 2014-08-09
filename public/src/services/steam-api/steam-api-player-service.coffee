@@ -1,4 +1,11 @@
-angular.module('steamApi.player', [])
+#
+# steam-api-player-service.coffee
+#
+# A service exposing a class for modelling a steam player as returned from the
+# Steam API.
+#
+
+angular.module('dotaStats.services.steamApi')
 .factory 'SteamPlayer', ['$q', 'steamApiCaller', 'SteamDotaMatch',
   ($q, steamApiCaller, SteamDotaMatch) ->
     class SteamPlayer

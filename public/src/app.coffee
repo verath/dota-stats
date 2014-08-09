@@ -1,6 +1,6 @@
 'use strict';
 
-app = angular.module 'myApp', [
+angular.module 'dotaStats', [
   'ngRoute'
   'ngAnimate'
   'lodash'
@@ -8,38 +8,18 @@ app = angular.module 'myApp', [
   'angularMoment'
   'mgcrea.ngStrap'
   'LocalForageModule'
-  'steamApi'
   'angulartics'
   'angulartics.google.analytics'
-  'myApp.services'
-  'myApp.directives'
-  'myApp.controllers'
+  'EventEmitter'
+  'dotaStats.controllers'
+  'dotaStats.directives'
+  'dotaStats.filters'
+  'dotaStats.services'
+  'dotaStats.services.steamApi'
 ]
 
-app.config ['$routeProvider', '$locationProvider',
-  ($routeProvider, $locationProvider) ->
-    $locationProvider.html5Mode(true).hashPrefix('!')
-
-    $routeProvider
-    .when('/', {
-        controller: 'ViewHomeCtrl as homeCtrl'
-        templateUrl: '/partials/home.html'
-      })
-    .when('/player/:steamId', {
-        controller: 'ViewPlayerCtrl as playerCtrl',
-        templateUrl: '/partials/player/player.html',
-        resolve: {
-          playerData: ['ViewPlayerCtrlResolve', (ViewPlayerCtrlResolve) -> ViewPlayerCtrlResolve()]
-        }
-      })
-    .when('/match/:matchId', {
-        controller: 'ViewMatchCtrl as matchCtrl',
-        templateUrl: '/partials/match/match.html',
-        resolve: {
-          matchData: ['ViewMatchCtrlResolve', (ViewMatchCtrlResolve) -> ViewMatchCtrlResolve()]
-        }
-      })
-    .otherwise({
-        redirectTo: '/'
-      })
-]
+angular.module('dotaStats.controllers', [])
+angular.module('dotaStats.directives', [])
+angular.module('dotaStats.filters', [])
+angular.module('dotaStats.services', [])
+angular.module('dotaStats.services.steamApi', [])
