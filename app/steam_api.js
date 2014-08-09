@@ -36,12 +36,10 @@ function SteamApi(redisClient) {
     var SECONDS_MINUTE = 60;
     var SECONDS_HOUR = 60 * SECONDS_MINUTE;
     var SECONDS_DAY = 24 * SECONDS_HOUR;
-    var SECONDS_WEEK = 7 * SECONDS_DAY;
-    var SECONDS_MONTH = 30 * SECONDS_DAY;
 
     var METHOD_CACHE_EXPIRE_TIME = {
         '/IEconDOTA2_570/GetHeroes/v1': SECONDS_DAY,
-        '/IDOTA2Match_570/GetMatchDetails/v1': SECONDS_MONTH,
+        '/IDOTA2Match_570/GetMatchDetails/v1': SECONDS_DAY,
         '/ISteamUser/GetPlayerSummaries/v2': SECONDS_DAY,
         '/IDOTA2Match_570/GetMatchHistory/v1': 5 * SECONDS_MINUTE
     };
