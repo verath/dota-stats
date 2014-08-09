@@ -55,11 +55,9 @@ angular.module('dotaStats.controllers')
         # Load matches for the player
         @loadMoreMatches()
 
-        # Refresh matches REFRESH_MATCHES_INTERVAL
+        # Refresh matches every REFRESH_MATCHES_INTERVAL
         @matchProgressLoader.once('finish', () =>
-          @refreshMatchTimeout = $timeout(() =>
-            @refreshMatches()
-          , REFRESH_MATCHES_INTERVAL)
+          @refreshMatchTimeout = $timeout(@refreshMatches, REFRESH_MATCHES_INTERVAL)
         )
 
         $scope.$on '$destroy', () =>
@@ -92,7 +90,7 @@ angular.module('dotaStats.controllers')
           .catch @onMatchesLoadError
 
       # Method for refreshing the first few match
-      refreshMatches: () ->
+      refreshMatches: () =>
         @player.getMatches(10, null, false).then (matchData) =>
           highMatchId = @matches[0].match_id
           newMatches = _.filter matchData.matches, (match) ->
