@@ -47,7 +47,7 @@
                 <li data-match-route="^/$">
                     <a href="/">Home</a>
                 </li>
-                <li data-match-route="/player/{{userCtrl.user.steamid64}}" ng-show="userCtrl.user" class="hide-no-js">
+                <li ng-show="userCtrl.user" class="hide-no-js" route-active-when="^/player/{{userCtrl.user.steamid64}}$">
                     <a href="/player/{{userCtrl.user.steamid64}}">Your Profile</a>
                 </li>
             </ul>
