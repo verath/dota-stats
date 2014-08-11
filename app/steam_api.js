@@ -103,7 +103,11 @@ function SteamApi(redisClient) {
                     requestDefer.resolve(response);
                 }
             }, function (err) {
-                requestDefer.reject(err);
+                if(err.code == 'ETIMEDOUT') {
+                    requestDefer.reject(new SteamApiError("The request to the Steam API timed out.", 503));
+                } else {
+                    requestDefer.reject(err);
+                }
             });
 
             return Q.delay(STEAM_API_REQUEST_DELAY)
