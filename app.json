@@ -5,7 +5,7 @@
   "success_url": "/",
   "env": {
     "SITE_URL": {
-      "description": "The http root where the site is hosted. (eg. 'http://dota-stats.ibepeter.com')",
+      "description": "The http root where the site is hosted. (eg. 'http://dota-stats.ibepeter.com')"
     },
     "STEAM_API_KEY": {
       "description": "The Steam API key to use. Get one at http://steamcommunity.com/dev/apikey."
