@@ -1,7 +1,9 @@
 # Dota 2 Stats
 An AngularJS app for displaying dota stats from the Steam Web API.
 
-## Running the app
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+## Running the app locally
 ### Prerequisites 
  * [Node.js and npm](http://nodejs.org/)
  * [Redis](http://redis.io/). (There is a Windows version of Redis available at [MSOpenTech/redis](https://github.com/MSOpenTech/redis), 

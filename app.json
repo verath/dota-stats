@@ -1,0 +1,17 @@
+{
+  "name": "Dota 2 Stats",
+  "description": "Personal Dota 2 stats",
+  "repository": "https://github.com/verath/dota-stats/",
+  "success_url": "/",
+  "env": {
+    "SITE_URL": {
+      "description": "The http root where the site is hosted. (eg. 'http://dota-stats.ibepeter.com')",
+    },
+    "STEAM_API_KEY": {
+      "description": "The Steam API key to use. Get one at http://steamcommunity.com/dev/apikey."
+    }
+  },
+  "addons": [
+    "rediscloud:25"
+  ]
+}
