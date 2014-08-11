@@ -16,6 +16,7 @@ angular.module 'dotaStats', [
   'dotaStats.filters'
   'dotaStats.services'
   'dotaStats.services.steamApi'
+  'dotaStats.templates'
 ]
 
 angular.module('dotaStats.controllers', [])
@@ -23,3 +24,4 @@ angular.module('dotaStats.directives', [])
 angular.module('dotaStats.filters', [])
 angular.module('dotaStats.services', [])
 angular.module('dotaStats.services.steamApi', [])
+angular.module('dotaStats.templates', [])

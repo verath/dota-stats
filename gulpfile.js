@@ -11,6 +11,7 @@ var minifyCSS = require('gulp-minify-css');
 var imagemin = require('gulp-imagemin');
 var replace = require('gulp-replace');
 var plumber = require('gulp-plumber');
+var templateCache = require('gulp-angular-templatecache');
 
 var paths = {
     coffee_scripts: ['public/src/**/*.coffee'],
@@ -70,12 +71,18 @@ var paths = {
         }),
 
     images: [
+        'img/**/*',
+
         // Dota2 Minimap Hero Sprites https://github.com/bontscho/dota2-minimap-hero-sprites
         'ext/dota2-minimap-hero-sprites/assets/images/minimap_hero_sheet.png'
     ].map(function (val) {
             // Add "public/" to all paths
             return 'public/' + val;
-        })
+        }),
+
+    templates : [
+        'public/partials/**/*.html'
+    ]
 };
 
 var onError = function (err) {
@@ -121,14 +128,22 @@ gulp.task('images', ['clean'], function() {
         .pipe(gulp.dest('public/build/img'));
 });
 
+gulp.task('templates', ['clean'], function() {
+    return gulp.src(paths.templates)
+        .pipe(templateCache({
+            module: 'dotaStats.templates',
+            root: '/partials/'}))
+        .pipe(gulp.dest('public/build/js'));
+});
 
-gulp.task('watch', ['scripts', 'css', 'images'], function () {
+
+gulp.task('watch', ['scripts', 'css', 'images', 'templates'], function () {
     var watchPaths = [];
     for(var path in paths) {
         watchPaths.push(paths[path]);
     }
-    gulp.watch(watchPaths, ['scripts', 'css', 'images']);
+    gulp.watch(watchPaths, ['scripts', 'css', 'images', 'templates']);
 });
 
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['scripts', 'css', 'images']);
+gulp.task('default', ['scripts', 'css', 'images', 'templates']);
