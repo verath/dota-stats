@@ -3,7 +3,7 @@ var http = require('http');
 var querystring = require('querystring');
 var crypto = require('crypto');
 var q = require('q');
-var q_http = require("q-io/http");
+var q_http = require('q-io/http');
 
 /**
  * Error thrown to indicate that an error occurred on Steam's end.
@@ -76,7 +76,7 @@ function SteamApi(redisClient) {
             '/IDOTA2Match_570/GetMatchDetails/v1': SECONDS_DAY,
             '/ISteamUser/GetPlayerSummaries/v2': SECONDS_DAY,
             '/IDOTA2Match_570/GetMatchHistory/v1': 5 * SECONDS_MINUTE
-        }
+        };
     })();
 
     /**
@@ -153,7 +153,7 @@ function SteamApi(redisClient) {
      * Queues an HTTP API request to perform as soon as the STEAM_API_REQUEST_DELAY allows. Returns a
      * promise for a q_http response.
      * @param url The url to send the HTTP request to.
-     * @returns {Promise} A promise for a q_http response.
+     * @return {Promise} A promise for a q_http response.
      * @private
      */
     this._queueApiRequest = function (url) {
@@ -177,12 +177,12 @@ function SteamApi(redisClient) {
                 }
             }, function (err) {
                 if (err.code == 'ETIMEDOUT') {
-                    requestDefer.reject(new SteamApiError("The request to the Steam API timed out.", 503));
+                    requestDefer.reject(new SteamApiError('The request to the Steam API timed out.', 503));
                 } else {
                     requestDefer.reject(err);
                 }
             });
-            return q.delay(STEAM_API_REQUEST_DELAY)
+            return q.delay(STEAM_API_REQUEST_DELAY);
         });
 
         return requestDefer.promise;
@@ -193,12 +193,12 @@ function SteamApi(redisClient) {
      * resolved with an object {{status: number, body:string}} on success.
      * @param {string} path The Steam API path to make the request to.
      * @param {Object} queryParams An object of query parameters to include in the request.
-     * @returns {Promise} A promise for an http response.
+     * @return {Promise} A promise for an http response.
      * @private
      *
      */
     this._httpGet = function (path, queryParams) {
-        var url = STEAM_API_BASE_URL + path + "?" + querystring.stringify(queryParams);
+        var url = STEAM_API_BASE_URL + path + '?' + querystring.stringify(queryParams);
         var status;
         return this._queueApiRequest(url).then(function (response) {
             status = response.status;
@@ -216,7 +216,7 @@ function SteamApi(redisClient) {
      * @param {string} path The Steam API path to make the request to.
      * @param {Object} queryParams An object of query parameters to include in the request.
      * @param {number} [expire] The time in seconds the possible response should be cached.
-     * @returns {Promise} A promise for an http response.
+     * @return {Promise} A promise for an http response.
      * @see {@link _httpGet}
      * @private
      */
@@ -232,10 +232,10 @@ function SteamApi(redisClient) {
         var paramsNoKey = queryParams;
         delete paramsNoKey['key'];
         var md5sum = crypto.createHash('md5');
-        var redisKey = md5sum.update(path + "?" + querystring.stringify(paramsNoKey)).digest('hex');
+        var redisKey = md5sum.update(path + '?' + querystring.stringify(paramsNoKey)).digest('hex');
 
         var _this = this;
-        return q.ninvoke(this._redisClient, "get", redisKey).then(function (data) {
+        return q.ninvoke(this._redisClient, 'get', redisKey).then(function (data) {
             if (data) {
                 return q.resolve({status: 200, body: data, cache: true});
             } else {
@@ -259,7 +259,7 @@ function SteamApi(redisClient) {
      * @param interfaceName
      * @param methodName
      * @param versionNumber
-     * @returns {boolean} True if the combination exist, else false
+     * @return {boolean} True if the combination exist, else false
      * @private
      */
     this._apiMethodExists = function (interfaceName, methodName, versionNumber) {
@@ -291,7 +291,7 @@ function SteamApi(redisClient) {
      * Sets the Steam API key used for any future requests. The key is validated against an
      * API method to make sure it is valid. Returns a promise that is resolved on success.
      * @param {string} key The Steam API key to use.
-     * @returns {Promise} A Q promise resolved on success.
+     * @return {Promise} A Q promise resolved on success.
      */
     this.setApiKey = function (key) {
         var _this = this;
@@ -313,7 +313,7 @@ function SteamApi(redisClient) {
     /**
      * Queries the Steam API for all API methods available. This method must resolve
      * before any calls to {@link doApiCall} will succeed.
-     * @returns {Promise} A Q promise resolved if successfully got list of methods from the Steam API.
+     * @return {Promise} A Q promise resolved if successfully got list of methods from the Steam API.
      */
     this.loadApiMethods = function () {
         var _this = this;
@@ -365,9 +365,9 @@ function SteamApi(redisClient) {
      * @param {string} interfaceName The interface name of the Steam API
      * @param {string} methodName The method of the interface to query
      * @param {string} versionNumber The version number of the method
-     * @param {Object} [queryParams={}] A key-value object of query parameters.
+     * @param {Object} [queryParams= {}] A key-value object of query parameters.
      * @param {boolean} [cache=true] A flag for if the result is allowed to be cached.
-     * @returns {Promise} A Q promise resolved with the JSON-decoded Steam API result on success.
+     * @return {Promise} A Q promise resolved with the JSON-decoded Steam API result on success.
      */
     this.doApiCall = function (interfaceName, methodName, versionNumber, queryParams, cache) {
         queryParams = queryParams || {};
@@ -392,7 +392,7 @@ function SteamApi(redisClient) {
                     if (response.status === 200) {
                         try {
                             var jsonBody = JSON.parse(response.body);
-                            console.log(methodPath, response.cache ? '(Cached)' : '', (new Date().getTime() - startTime) + "ms");
+                            console.log(methodPath, response.cache ? '(Cached)' : '', (new Date().getTime() - startTime) + 'ms');
                             return q.resolve(jsonBody);
                         } catch (err) {
                             return q.reject(err);
@@ -402,11 +402,11 @@ function SteamApi(redisClient) {
                     } else {
                         return q.reject(new Error('Unexpected HTTP response code "' + response.status + '".'));
                     }
-                })
+                });
         } else {
-            return q.reject(new SteamApiError("The API method specified does not exist.", 404));
+            return q.reject(new SteamApiError('The API method specified does not exist.', 404));
         }
-    }
+    };
 }
 
 module.exports = {
