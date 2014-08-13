@@ -18,7 +18,7 @@ function SteamApiError(message, status) {
     this.name = 'SteamApiError';
     this.message = message;
     this.status = status || 500;
-    this.stack = (new Error()).stack;
+    this.stack = (new Error(message)).stack;
 }
 
 /**
@@ -48,7 +48,7 @@ var STEAM_API_BASE_URL = 'http://api.steampowered.com';
  * @const
  * @default
  */
-var VALIDATE_KEY_METHOD = '/IDOTA2Match_570/GetMatchDetails/v1/';
+var VALIDATE_KEY_METHOD = '/IDOTA2Match_570/GetMatchDetails/v1';
 
 /**
  * API method listing the api methods
@@ -239,7 +239,7 @@ SteamApi.prototype._cachedHttpGet = function (path, queryParams, expire) {
     }
 
     // Let's not store the api key in the redis database.
-    var paramsNoKey = queryParams;
+    var paramsNoKey = JSON.parse(JSON.stringify(queryParams)); // Hackish deep copy
     delete paramsNoKey['key'];
     var md5sum = crypto.createHash('md5');
     var redisKey = md5sum.update(path + '?' + querystring.stringify(paramsNoKey)).digest('hex');
@@ -311,13 +311,13 @@ SteamApi.prototype._hasRequiredParameters = function (interfaceName, methodName,
  */
 SteamApi.prototype.setApiKey = function (key) {
     var _this = this;
-    return this._cachedHttpGet(VALIDATE_KEY_METHOD, {match_id: -1, key: key}, 60 * 60 * 24)
+    return this._httpGet(VALIDATE_KEY_METHOD, {match_id: -1, key: key})
         .then(function (response) {
             if (response.status === 200) {
                 _this._apiKey = key;
                 return q.resolve();
             } else if (response.status === 401) {
-                return q.reject(new SteamApiError('Invalid API Key.', 401));
+                return q.reject(new Error('Invalid API Key.'));
             } else {
                 return q.reject(new Error(
                         'Unexpected HTTP response code "' + response.status +
@@ -333,7 +333,7 @@ SteamApi.prototype.setApiKey = function (key) {
  */
 SteamApi.prototype.loadApiMethods = function () {
     var _this = this;
-    return this._cachedHttpGet(SUPPORTED_API_LIST_METHOD, {key: this._apiKey})
+    return this._httpGet(SUPPORTED_API_LIST_METHOD, {key: this._apiKey})
         .then(function (response) {
             if (response.status !== 200) {
                 return q.reject('HTTP Error: ' + response.status);
@@ -393,9 +393,8 @@ SteamApi.prototype.doApiCall = function (interfaceName, methodName, versionNumbe
     queryParams['key'] = this._apiKey;
     var startTime = new Date().getTime();
 
-    var imv = [interfaceName, methodName, versionNumber];
-    if (this._apiMethodExists.apply(this, imv)) {
-        if (this._hasRequiredParameters.apply(this, imv) !== true) {
+    if (this._apiMethodExists(interfaceName, methodName, versionNumber)) {
+        if (this._hasRequiredParameters(interfaceName, methodName, versionNumber, queryParams) !== true) {
             return q.reject(new SteamApiError('Missing required parameter.', 400));
         }
 

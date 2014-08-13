@@ -72,7 +72,7 @@ app.get('/api/:interfaceName/:methodName/:versionNumber', function (req, res, ne
         .done(function (result) {
             res.send(result);
         }, function (err) {
-            if(err instanceof Error || err instanceof SteamApi.SteamApiError) {
+            if (err instanceof Error || err instanceof SteamApi.SteamApiError) {
                 next(err)
             } else {
                 next(new Error(err));
@@ -131,7 +131,7 @@ app.use(function (req, res, next) {
 app.use(function (err, req, res, next) {
     // All errors we want sent to the client will be instance of SteamApiError
     // a normal Error should indicate it is an error on our side
-    if(err instanceof SteamApi.SteamApiError) {
+    if (err instanceof SteamApi.SteamApiError) {
         console.log('[' + err.status + '] SteamApiError: ' + err.message);
     } else {
         console.error(err.stack);
@@ -148,8 +148,9 @@ app.set('port', process.env.PORT || 3000);
 // Validate steam key and fetch the api methods
 (function () {
     steamApi.setApiKey(config.STEAM_API_KEY || process.env.STEAM_API_KEY)
-        .then(steamApi.loadApiMethods)
         .then(function () {
+            return steamApi.loadApiMethods();
+        }).then(function () {
             var runningDefer = Q.defer();
             var server = app.listen(app.get('port'), function () {
                 console.log("Server running on port " + server.address().port + "...");
@@ -162,6 +163,7 @@ app.set('port', process.env.PORT || 3000);
         .fail(function (err) {
             if (err) {
                 console.error(err.stack);
+                process.exit(1);
             }
         })
         .done();
