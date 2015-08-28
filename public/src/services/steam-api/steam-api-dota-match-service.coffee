@@ -27,6 +27,7 @@ angular.module('dotaStats.services.steamApi')
         13: 'New Player Pool'
         14: 'Compendium Matchmaking'
         16: 'Captains Draft'
+        22: 'All Pick'
       }
 
       constructor: (matchId) ->
