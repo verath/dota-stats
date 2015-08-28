@@ -1,0 +1,3 @@
+[submodule "public/ext/dota2-minimap-hero-sprites"]
+	path = public/ext/dota2-minimap-hero-sprites
+	url = https://github.com/bontscho/dota2-minimap-hero-sprites.git
